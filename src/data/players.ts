@@ -1,6 +1,116 @@
 import { Player, Experience } from "@/types";
 
-// Seed data will go here — 30-50 players with realistic profiles
-export const players: Player[] = [];
+export const players: Player[] = [
+  {
+    id: "p1",
+    name: "Alex Chen",
+    descriptor: "CS '26 · College of Engineering",
+    photo: "/avatars/alex.jpg",
+    headline: "Building the future of distributed systems",
+    rating: 1520,
+    wins: 12,
+    losses: 3,
+    ties: 2,
+    exposureCount: 17,
+    isActive: true,
+    isHidden: false,
+    tags: ["engineering", "backend"],
+  },
+  {
+    id: "p2",
+    name: "Jordan Rivera",
+    descriptor: "INFO '25 · College of Arts & Sciences",
+    photo: "/avatars/jordan.jpg",
+    headline: "Product thinker, design nerd, startup junkie",
+    rating: 1480,
+    wins: 10,
+    losses: 5,
+    ties: 1,
+    exposureCount: 16,
+    isActive: true,
+    isHidden: false,
+    tags: ["product", "design"],
+  },
+  {
+    id: "p3",
+    name: "Priya Sharma",
+    descriptor: "CS & Math '27 · College of Engineering",
+    photo: "/avatars/priya.jpg",
+    headline: "ML researcher by day, hackathon addict by night",
+    rating: 1550,
+    wins: 14,
+    losses: 2,
+    ties: 3,
+    exposureCount: 19,
+    isActive: true,
+    isHidden: false,
+    tags: ["engineering", "ml", "research"],
+  },
+];
 
-export const experiences: Experience[] = [];
+export const experiences: Experience[] = [
+  // Alex Chen
+  {
+    id: "e1",
+    playerId: "p1",
+    companyName: "Meta",
+    companyLogo: "/logos/meta.svg",
+    roleTitle: "SWE Intern",
+    sortOrder: 1,
+  },
+  {
+    id: "e2",
+    playerId: "p1",
+    companyName: "Stripe",
+    companyLogo: "/logos/stripe.svg",
+    roleTitle: "Backend Intern",
+    sortOrder: 2,
+  },
+  {
+    id: "e3",
+    playerId: "p1",
+    companyName: "Cornell CSRD",
+    roleTitle: "Research Assistant",
+    sortOrder: 3,
+  },
+  // Jordan Rivera
+  {
+    id: "e4",
+    playerId: "p2",
+    companyName: "Figma",
+    companyLogo: "/logos/figma.svg",
+    roleTitle: "Product Design Intern",
+    sortOrder: 1,
+  },
+  {
+    id: "e5",
+    playerId: "p2",
+    companyName: "YC Startup (S24)",
+    roleTitle: "Co-founder",
+    sortOrder: 2,
+  },
+  // Priya Sharma
+  {
+    id: "e6",
+    playerId: "p3",
+    companyName: "Google DeepMind",
+    companyLogo: "/logos/deepmind.svg",
+    roleTitle: "Research Intern",
+    sortOrder: 1,
+  },
+  {
+    id: "e7",
+    playerId: "p3",
+    companyName: "Jane Street",
+    companyLogo: "/logos/janestreet.svg",
+    roleTitle: "SWE Intern",
+    sortOrder: 2,
+  },
+  {
+    id: "e8",
+    playerId: "p3",
+    companyName: "Cornell AI Lab",
+    roleTitle: "Undergraduate Researcher",
+    sortOrder: 3,
+  },
+];
