@@ -1,14 +1,18 @@
+import { AboutHero } from "@/components/about/AboutHero";
+import { HowItWorks } from "@/components/about/HowItWorks";
+import { EloExplainer } from "@/components/about/EloExplainer";
+import { FAQ } from "@/components/about/FAQ";
+import { Disclaimer } from "@/components/about/Disclaimer";
+
 export default function AboutPage() {
   return (
-    <div className="flex flex-1 flex-col items-center gap-4 py-12">
-      <h1 className="text-3xl font-bold tracking-tight">About</h1>
-      <p className="max-w-lg text-center text-muted-foreground">
-        Big Red Rankings is a playful social game where Cornell students vote on
-        who&apos;s more cracked. It&apos;s for fun — not a serious ranking.
-      </p>
-      {/* AboutSections will go here */}
-      <div className="mt-8 w-full max-w-2xl rounded-xl border border-dashed border-border p-16 text-center text-sm text-muted-foreground">
-        About sections placeholder
+    <div className="flex flex-1 flex-col items-center px-6 py-16">
+      <div className="w-full max-w-2xl space-y-20">
+        <AboutHero />
+        <HowItWorks />
+        <EloExplainer />
+        <FAQ />
+        <Disclaimer />
       </div>
     </div>
   );
