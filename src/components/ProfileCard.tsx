@@ -5,15 +5,28 @@ import { ExperienceList } from "./ExperienceList";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 
+// Official school hex colors — used for dot indicator and card gradient
+const SCHOOL_HEX: Record<IvySchool, string> = {
+  Harvard:   "#a41034",  // Harvard Crimson
+  Yale:      "#00356b",  // Yale Blue
+  Princeton: "#e77500",  // Princeton Orange
+  Columbia:  "#1d4f91",  // Columbia Blue
+  Penn:      "#990000",  // Penn Red
+  Brown:     "#4e3629",  // Brown (dark brown)
+  Cornell:   "#b31b1b",  // Cornell Carnelian
+  Dartmouth: "#00693e",  // Dartmouth Green
+};
+
+// Dot indicator colors (slightly lighter for readability at small size)
 const SCHOOL_COLORS: Record<IvySchool, string> = {
-  Harvard:   "oklch(0.45 0.17 25)",
-  Yale:      "oklch(0.55 0.14 260)",
-  Princeton: "oklch(0.45 0.15 265)",
-  Columbia:  "oklch(0.55 0.14 230)",
-  Penn:      "oklch(0.55 0.14 235)",
-  Brown:     "oklch(0.55 0.14 55)",
-  Cornell:   "oklch(0.55 0.14 25)",
-  Dartmouth: "oklch(0.50 0.12 155)",
+  Harvard:   "#c41e3a",
+  Yale:      "#0f4d92",
+  Princeton: "#e87722",
+  Columbia:  "#2b6cb0",
+  Penn:      "#cc0000",
+  Brown:     "#6b3a2a",
+  Cornell:   "#b31b1b",
+  Dartmouth: "#00693e",
 };
 
 interface ProfileCardProps {
@@ -46,9 +59,12 @@ export function ProfileCard({
     <motion.div
       layout
       onClick={onClick}
-      style={picked ? { boxShadow: "0 0 0 3px var(--color-ivy-accent-soft)" } : undefined}
+      style={{
+        background: `radial-gradient(ellipse at 50% -10%, ${SCHOOL_HEX[player.school]}40 0%, #ffffff 55%)`,
+        ...(picked ? { boxShadow: "0 0 0 3px var(--color-ivy-accent-soft)" } : {}),
+      }}
       className={cn(
-        "relative flex w-full flex-col items-center gap-0 rounded-xl border bg-card overflow-hidden",
+        "relative flex w-full flex-col items-center gap-0 rounded-xl border overflow-hidden",
         "transition-all duration-150",
         picked && "border-ivy-accent",
         !picked && "border-border",
@@ -75,7 +91,7 @@ export function ProfileCard({
 
       {/* Portrait */}
       <div className="px-6 pt-12 pb-4 w-full flex justify-center">
-        <div className="relative w-full max-w-[200px] aspect-square rounded-xl bg-muted overflow-hidden flex items-center justify-center">
+        <div className="relative w-full max-w-[200px] aspect-square rounded-xl bg-muted/60 overflow-hidden flex items-center justify-center">
           <AnimatePresence mode="wait">
             {!revealed ? (
               <motion.span

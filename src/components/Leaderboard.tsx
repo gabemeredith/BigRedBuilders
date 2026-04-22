@@ -10,14 +10,14 @@ const ALL_SCHOOLS: IvySchool[] = ["Brown", "Columbia", "Cornell", "Dartmouth", "
 const ALL_TAGS = ["SWE", "Quant", "Startup", "AI", "Research"] as const;
 
 const SCHOOL_COLORS: Record<IvySchool, string> = {
-  Harvard:   "oklch(0.45 0.17 25)",
-  Yale:      "oklch(0.55 0.14 260)",
-  Princeton: "oklch(0.45 0.15 265)",
-  Columbia:  "oklch(0.55 0.14 230)",
-  Penn:      "oklch(0.55 0.14 235)",
-  Brown:     "oklch(0.55 0.14 55)",
-  Cornell:   "oklch(0.55 0.14 25)",
-  Dartmouth: "oklch(0.50 0.12 155)",
+  Harvard:   "#c41e3a",
+  Yale:      "#0f4d92",
+  Princeton: "#e87722",
+  Columbia:  "#2b6cb0",
+  Penn:      "#cc0000",
+  Brown:     "#6b3a2a",
+  Cornell:   "#b31b1b",
+  Dartmouth: "#00693e",
 };
 
 type SortKey = "rating" | "wins" | "losses" | "winrate";
