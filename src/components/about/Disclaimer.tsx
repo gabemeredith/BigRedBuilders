@@ -21,7 +21,7 @@ export function Disclaimer() {
       <div className="pt-2">
         <a
           href="mailto:gabriel.b.meredith@gmail.com"
-          className="text-sm font-medium text-ivy-crimson underline-offset-4 hover:underline"
+          className="text-sm font-medium text-ivy-accent underline-offset-4 hover:underline"
         >
           Contact us →
         </a>

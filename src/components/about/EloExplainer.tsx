@@ -28,14 +28,14 @@ export function EloExplainer() {
         <h3 className="text-sm font-semibold">How gains work</h3>
         <ul className="space-y-2 text-sm text-muted-foreground">
           <li className="flex items-start gap-2">
-            <span className="mt-0.5 text-ivy-crimson">↑</span>
+            <span className="mt-0.5 text-ivy-accent">↑</span>
             <span>
               Beat someone ranked higher than you? Massive rating boost. The
               upset special.
             </span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="mt-0.5 text-ivy-crimson">→</span>
+            <span className="mt-0.5 text-ivy-accent">→</span>
             <span>
               Beat someone ranked similarly? Modest gain. Fair fight, fair
               reward.

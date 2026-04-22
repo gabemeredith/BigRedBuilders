@@ -1,7 +1,7 @@
 export function AboutHero() {
   return (
     <section className="space-y-4">
-      <p className="text-sm font-medium tracking-widest uppercase text-ivy-crimson">
+      <p className="text-sm font-medium tracking-widest uppercase text-ivy-accent">
         The Definitive* Source
       </p>
       <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
