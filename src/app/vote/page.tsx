@@ -1,7 +1,6 @@
 "use client";
 
 import { VoteArena } from "@/components/VoteArena";
-import { players, experiences } from "@/data/players";
 
 export default function VotePage() {
   return (
@@ -14,7 +13,7 @@ export default function VotePage() {
           Compare two Ivy profiles blind. Vote your gut.
         </p>
       </div>
-      <VoteArena players={players} experiences={experiences} />
+      <VoteArena />
     </div>
   );
 }

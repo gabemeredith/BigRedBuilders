@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { IvySchool } from "@/types";
 import { cn } from "@/lib/utils";
+import { isIvyEduEmail, getIvySchoolFromEmail } from "@/lib/ivy-domains";
 
 const IVY_SCHOOLS: IvySchool[] = ["Brown", "Columbia", "Cornell", "Dartmouth", "Harvard", "Penn", "Princeton", "Yale"];
 
@@ -11,6 +12,9 @@ type FormState = {
   school: IvySchool | "";
   profileUrl: string;
   nominator: string;
+  eduEmail: string;
+  descriptor: string;
+  headline: string;
 };
 
 export default function NominatePage() {
@@ -19,36 +23,64 @@ export default function NominatePage() {
     school: "",
     profileUrl: "",
     nominator: "",
+    eduEmail: "",
+    descriptor: "",
+    headline: "",
   });
   const [submitted, setSubmitted] = useState(false);
-  const [copied, setCopied] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
 
-  function buildMailtoBody() {
-    return [
-      `Nominee: ${form.name}`,
-      `School: ${form.school}`,
-      `LinkedIn / GitHub: ${form.profileUrl}`,
-      form.nominator ? `Nominated by: ${form.nominator}` : "",
-    ].filter(Boolean).join("\n");
+  const emailEntered = form.eduEmail.trim().length > 0;
+  const emailValid = emailEntered && isIvyEduEmail(form.eduEmail);
+  const emailSchool = emailEntered ? getIvySchoolFromEmail(form.eduEmail) : null;
+
+  function handleEmailChange(email: string) {
+    const school = getIvySchoolFromEmail(email);
+    setForm((f) => ({
+      ...f,
+      eduEmail: email,
+      school: school && !f.school ? school : f.school,
+    }));
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!form.name || !form.school || !form.profileUrl) return;
+    if (emailEntered && !emailValid) {
+      setError("Please enter a valid Ivy League .edu email or leave it blank.");
+      return;
+    }
 
-    const subject = encodeURIComponent(`rIVYalry nomination: ${form.name}`);
-    const body = encodeURIComponent(buildMailtoBody());
-    window.location.href = `mailto:gabriel.b.meredith@gmail.com?subject=${subject}&body=${body}`;
-    setSubmitted(true);
-  }
+    setSubmitting(true);
+    setError("");
 
-  async function handleCopy() {
     try {
-      await navigator.clipboard.writeText(buildMailtoBody());
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      const res = await fetch("/api/nominations", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          name: form.name,
+          school: form.school,
+          profileUrl: form.profileUrl,
+          nominatorName: form.nominator || undefined,
+          eduEmail: form.eduEmail || undefined,
+          descriptor: form.descriptor || undefined,
+          headline: form.headline || undefined,
+        }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        setError(data.error ?? "Something went wrong. Try again.");
+        setSubmitting(false);
+        return;
+      }
+
+      setSubmitted(true);
     } catch {
-      // ignore
+      setError("Network error. Check your connection and try again.");
+      setSubmitting(false);
     }
   }
 
@@ -59,17 +91,11 @@ export default function NominatePage() {
           <span className="text-3xl font-black text-ivy-accent">✓</span>
         </div>
         <div>
-          <h1 className="text-3xl font-black tracking-tight">Nomination sent.</h1>
+          <h1 className="text-3xl font-black tracking-tight">Nomination received.</h1>
           <p className="mt-2 text-muted-foreground font-mono text-sm max-w-sm mx-auto">
-            We&apos;ll verify and add them within 48 hours. If your email client didn&apos;t open, copy the details below.
+            We&apos;ll verify and add them within 48 hours.
           </p>
         </div>
-        <button
-          onClick={handleCopy}
-          className="rounded-md border border-border px-4 py-2 text-sm font-semibold transition-colors hover:bg-muted"
-        >
-          {copied ? "Copied!" : "Copy nomination text"}
-        </button>
       </div>
     );
   }
@@ -124,6 +150,51 @@ export default function NominatePage() {
           />
         </Field>
 
+        <Field
+          label="Their .edu email"
+          hint={
+            emailEntered
+              ? emailValid
+                ? `✓ Verified ${emailSchool} address`
+                : "Not a recognized Ivy .edu domain"
+              : "Optional — helps us verify enrollment"
+          }
+          hintColor={emailEntered ? (emailValid ? "green" : "red") : "muted"}
+        >
+          <input
+            type="email"
+            placeholder="jane@cornell.edu"
+            value={form.eduEmail}
+            onChange={(e) => handleEmailChange(e.target.value)}
+            className={cn(
+              inputCls,
+              emailEntered && (emailValid
+                ? "border-green-500 focus:border-green-500"
+                : "border-red-400 focus:border-red-400")
+            )}
+          />
+        </Field>
+
+        <Field label="Year + major (optional)" hint="e.g. CS '26 · College of Engineering">
+          <input
+            type="text"
+            placeholder="CS '26 · College of Engineering"
+            value={form.descriptor}
+            onChange={(e) => setForm((f) => ({ ...f, descriptor: e.target.value }))}
+            className={inputCls}
+          />
+        </Field>
+
+        <Field label="Most cracked thing they've done (optional)" hint="One punchy line. Include metrics if startup stuff.">
+          <input
+            type="text"
+            placeholder="Built a compiler in Rust for fun"
+            value={form.headline}
+            onChange={(e) => setForm((f) => ({ ...f, headline: e.target.value }))}
+            className={inputCls}
+          />
+        </Field>
+
         <Field label="Your name (optional)">
           <input
             type="text"
@@ -134,17 +205,15 @@ export default function NominatePage() {
           />
         </Field>
 
+        {error && <p className="text-xs font-mono text-red-500">{error}</p>}
+
         <button
           type="submit"
-          disabled={!form.name || !form.school || !form.profileUrl}
+          disabled={!form.name || !form.school || !form.profileUrl || submitting}
           className="w-full rounded-md bg-foreground px-4 py-2.5 text-sm font-bold text-background transition-colors hover:bg-foreground/85 disabled:opacity-40 disabled:cursor-not-allowed"
         >
-          Submit nomination →
+          {submitting ? "Submitting…" : "Submit nomination →"}
         </button>
-
-        <p className="text-center font-mono text-[11px] text-muted-foreground">
-          Opens your email client with details pre-filled.
-        </p>
       </form>
 
       <div className="rounded-xl border border-border bg-muted/40 px-6 py-4 max-w-md w-full space-y-2 font-mono text-[12px] text-muted-foreground">
@@ -163,10 +232,14 @@ const inputCls =
 function Field({
   label,
   required,
+  hint,
+  hintColor = "muted",
   children,
 }: {
   label: string;
   required?: boolean;
+  hint?: string;
+  hintColor?: "muted" | "green" | "red";
   children: React.ReactNode;
 }) {
   return (
@@ -175,6 +248,16 @@ function Field({
         {label}{required && <span className="text-ivy-accent ml-0.5">*</span>}
       </label>
       {children}
+      {hint && (
+        <p className={cn(
+          "font-mono text-[11px]",
+          hintColor === "green" ? "text-green-600"
+          : hintColor === "red" ? "text-red-500"
+          : "text-muted-foreground"
+        )}>
+          {hint}
+        </p>
+      )}
     </div>
   );
 }
