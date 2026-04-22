@@ -1,0 +1,631 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=1280" />
+<title>rivyalry — who's the most cracked in the ivy league?</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg: oklch(0.995 0.002 260);
+    --bg-2: oklch(0.975 0.003 260);
+    --bg-3: oklch(0.955 0.004 260);
+    --line: oklch(0.92 0.005 260);
+    --line-2: oklch(0.86 0.006 260);
+    --ink: oklch(0.18 0.015 260);
+    --ink-2: oklch(0.42 0.012 260);
+    --ink-3: oklch(0.60 0.010 260);
+    /* ivy green — subtle, not saturated */
+    --accent: oklch(0.42 0.09 155);
+    --accent-2: oklch(0.35 0.09 155);
+    --accent-soft: oklch(0.96 0.028 155);
+    --good: oklch(0.48 0.11 155);
+    --good-soft: oklch(0.95 0.028 155);
+    --bad: oklch(0.55 0.16 25);
+    --sans: "Helvetica Neue", "Helvetica", "Inter Tight", Arial, sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+    --serif: "Helvetica Neue", "Helvetica", "Inter Tight", Arial, sans-serif;
+    --r: 10px;
+  }
+  body[data-theme="dark"] {
+    --bg: oklch(0.14 0.008 155);
+    --bg-2: oklch(0.18 0.01 155);
+    --bg-3: oklch(0.22 0.012 155);
+    --line: oklch(0.26 0.012 155);
+    --line-2: oklch(0.34 0.014 155);
+    --ink: oklch(0.96 0.008 155);
+    --ink-2: oklch(0.78 0.01 155);
+    --ink-3: oklch(0.58 0.012 155);
+    --accent: oklch(0.72 0.14 155);
+    --accent-soft: oklch(0.24 0.07 155);
+    --good: oklch(0.72 0.14 155);
+    --good-soft: oklch(0.24 0.07 155);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); -webkit-font-smoothing: antialiased; }
+  button { font-family: inherit; }
+  a { color: inherit; text-decoration: none; }
+
+  .page { max-width: 1120px; margin: 0 auto; padding: 0 32px 120px; }
+
+  /* NAV */
+  nav.top {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 32px;
+    background: color-mix(in oklch, var(--bg) 80%, transparent);
+    backdrop-filter: saturate(1.4) blur(10px);
+    border-bottom: 1px solid var(--line);
+    position: sticky; top: 0; z-index: 20;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 800; letter-spacing: -0.02em; text-transform: uppercase; }
+  .brand .dot { width: 22px; height: 22px; border-radius: 50%; background: var(--ink); position: relative; }
+  .brand .dot::after { content: ""; position: absolute; inset: 6px; background: var(--accent); border-radius: 50%; }
+  .nav-links { display: flex; gap: 2px; font-size: 14px; }
+  .nav-links button { background: none; border: 0; color: var(--ink-2); padding: 7px 12px; cursor: pointer; border-radius: 7px; transition: color 0.12s, background 0.12s; font-weight: 600; }
+  .nav-links button:hover { color: var(--ink); background: var(--bg-2); }
+  .nav-links button.active { color: var(--ink); background: var(--bg-3); }
+  .nav-right { display: flex; align-items: center; gap: 10px; }
+  .session { font-size: 12px; color: var(--ink-3); display: flex; align-items: center; gap: 6px; }
+  .session .pulse { width: 6px; height: 6px; background: var(--good); border-radius: 50%; box-shadow: 0 0 0 3px color-mix(in oklch, var(--good) 18%, transparent); }
+
+  .btn { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: var(--ink); padding: 9px 14px; cursor: pointer; border: 1px solid var(--line-2); background: var(--bg); border-radius: 8px; transition: all 0.12s; letter-spacing: -0.005em; }
+  .btn:hover { background: var(--bg-2); border-color: var(--ink-3); }
+  .btn.primary { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+  .btn.primary:hover { background: color-mix(in oklch, var(--ink) 85%, black); }
+  .btn.ghost { border-color: transparent; color: var(--ink-2); }
+  .btn.ghost:hover { background: var(--bg-2); color: var(--ink); }
+  .btn.sm { padding: 6px 10px; font-size: 13px; }
+  .btn.accent { background: var(--accent); color: white; border-color: var(--accent); }
+  .kbd { font-family: var(--mono); font-size: 11px; padding: 1px 5px; background: color-mix(in oklch, currentColor 8%, transparent); border: 1px solid color-mix(in oklch, currentColor 14%, transparent); border-radius: 4px; }
+
+  h1.title { font-size: 44px; font-weight: 800; letter-spacing: -0.035em; line-height: 1.0; margin: 0; text-transform: none; }
+  h1.title em { font-style: normal; font-weight: 800; color: var(--accent); }
+  .subtitle { color: var(--ink-3); font-size: 15px; margin-top: 10px; max-width: 540px; text-align: center; line-height: 1.5; }
+  .page-head { padding: 56px 0 28px; display: flex; flex-direction: column; align-items: center; text-align: center; }
+
+  .screen { display: none; }
+  .screen.on { display: block; animation: fade .22s ease-out; }
+  @keyframes fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+  .meta-row { display: flex; justify-content: space-between; align-items: center; margin-top: 24px; font-size: 13px; color: var(--ink-3); }
+  .meta-row .record b { color: var(--ink); font-weight: 600; }
+  .streak-pill { display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: 100px; background: var(--accent-soft); color: var(--accent); font-size: 12px; font-weight: 500; }
+
+  .duel { display: grid; grid-template-columns: 1fr 52px 1fr; margin-top: 28px; align-items: stretch; }
+  .divider { display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; letter-spacing: 0.08em; color: var(--ink-3); text-transform: uppercase; }
+
+  .contender { background: var(--bg); border: 1px solid var(--line); border-radius: var(--r); padding: 22px; display: flex; flex-direction: column; cursor: pointer; transition: border-color .15s, box-shadow .15s, transform .15s; }
+  .contender:hover { border-color: var(--ink); box-shadow: 0 6px 24px -12px color-mix(in oklch, var(--ink) 25%, transparent); transform: translateY(-2px); }
+  .contender.pick { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+  .contender-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+  .school-chip { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; color: var(--ink-2); padding: 4px 10px; border: 1px solid var(--line-2); border-radius: 100px; }
+  .school-chip .sq { width: 7px; height: 7px; border-radius: 2px; background: var(--ink-2); }
+  .side { font-family: var(--mono); font-size: 12px; color: var(--ink-3); width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; border: 1px solid var(--line-2); border-radius: 6px; }
+
+  .portrait { width: 100%; aspect-ratio: 1/1; max-width: 220px; margin: 4px auto 20px; background: var(--bg-2); border-radius: var(--r); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+  .portrait::before { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at 30% 30%, color-mix(in oklch, var(--ink) 6%, transparent), transparent 60%); }
+  .portrait .q { font-size: 64px; font-weight: 800; color: var(--ink-3); opacity: 0.35; z-index: 1; letter-spacing: -0.04em; }
+  .portrait.revealed { background: linear-gradient(135deg, var(--bg-2), var(--bg-3)); }
+  .portrait .initial { font-size: 88px; font-weight: 800; color: var(--ink); z-index: 1; letter-spacing: -0.04em; }
+
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; margin-bottom: 18px; padding: 14px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .stats .cell { padding: 0 14px; border-right: 1px solid var(--line); }
+  .stats .cell:first-child { padding-left: 0; }
+  .stats .cell:last-child { border-right: none; padding-right: 0; }
+  .stats .k { font-size: 11px; color: var(--ink-3); }
+  .stats .v { font-size: 22px; font-weight: 700; color: var(--ink); margin-top: 3px; letter-spacing: -0.025em; }
+  .stats .v .u { font-size: 12px; color: var(--ink-3); font-weight: 500; margin-left: 1px; }
+
+  .creds { display: flex; flex-direction: column; gap: 10px; }
+  .cred { display: grid; grid-template-columns: 28px 1fr; gap: 12px; align-items: center; }
+  .cred .ico { width: 28px; height: 28px; border-radius: 7px; background: var(--bg-2); border: 1px solid var(--line); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: var(--ink); }
+  .cred .l1 { font-size: 13.5px; font-weight: 500; color: var(--ink); line-height: 1.25; }
+  .cred .l2 { font-size: 12px; color: var(--ink-3); margin-top: 1px; }
+
+  .actions { display: flex; justify-content: center; gap: 8px; margin-top: 28px; }
+  .footnote { margin-top: 22px; text-align: center; font-family: var(--mono); font-size: 11px; color: var(--ink-3); }
+  .footnote .sep { margin: 0 10px; opacity: 0.5; }
+
+  .reveal-pill { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 100px; background: var(--bg-3); border: 1px solid var(--line); font-size: 13px; color: var(--ink-2); margin-top: 18px; }
+  .reveal-pill b { color: var(--ink); font-weight: 600; }
+  .revealed-name { font-size: 22px; font-weight: 700; color: var(--ink); margin: 0; text-align: center; letter-spacing: -0.02em; }
+  .revealed-handle { font-size: 12px; color: var(--ink-3); text-align: center; margin-top: 2px; margin-bottom: 14px; }
+
+  /* LEADERBOARD */
+  .lb { border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; background: var(--bg); }
+  .lb-filters { display: flex; justify-content: space-between; align-items: center; padding: 12px 18px; border-bottom: 1px solid var(--line); gap: 14px; flex-wrap: wrap; }
+  .chip-row { display: flex; gap: 4px; flex-wrap: wrap; }
+  .chip { padding: 5px 10px; border-radius: 100px; background: transparent; border: 1px solid transparent; font-size: 12px; color: var(--ink-3); cursor: pointer; transition: all .12s; font-family: inherit; }
+  .chip:hover { color: var(--ink); background: var(--bg-2); }
+  .chip.on { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+  .lb-head, .lb-row { display: grid; grid-template-columns: 56px 1fr 130px 100px 80px 80px 130px; padding: 14px 20px; align-items: center; gap: 12px; }
+  .lb-head { font-family: var(--mono); font-size: 11px; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.04em; background: var(--bg-2); border-bottom: 1px solid var(--line); }
+  .lb-head > div:nth-child(n+4) { text-align: right; }
+  .lb-row { border-bottom: 1px solid var(--line); transition: background .12s; cursor: pointer; }
+  .lb-row:last-child { border-bottom: none; }
+  .lb-row:hover { background: var(--bg-2); }
+  .lb-row > div:nth-child(n+4) { text-align: right; }
+  .lb-row .rank { font-size: 18px; font-weight: 700; color: var(--ink-3); letter-spacing: -0.02em; }
+  .lb-row.top1 .rank { color: var(--accent); }
+  .who { display: flex; align-items: center; gap: 12px; min-width: 0; }
+  .who .av { width: 36px; height: 36px; border-radius: 50%; background: var(--bg-2); border: 1px solid var(--line); display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700; color: var(--ink); flex-shrink: 0; letter-spacing: -0.02em; }
+  .who .nm { font-size: 14px; font-weight: 500; color: var(--ink); display: flex; align-items: center; gap: 6px; }
+  .who .sub { font-size: 11.5px; color: var(--ink-3); margin-top: 2px; }
+  .tag { font-size: 10px; padding: 1.5px 6px; border-radius: 4px; font-weight: 500; letter-spacing: 0.02em; }
+  .tag.hot { background: var(--accent-soft); color: var(--accent); }
+  .tag.new { background: var(--good-soft); color: var(--good); }
+  .score { font-size: 16px; font-weight: 700; color: var(--ink); letter-spacing: -0.02em; }
+  .winrate { font-family: var(--mono); font-size: 13px; color: var(--ink-2); }
+  .delta { font-family: var(--mono); font-size: 13px; font-weight: 500; }
+  .delta.up { color: var(--good); }
+  .delta.dn { color: var(--accent); }
+  .delta.flat { color: var(--ink-3); }
+  .spark { display: flex; justify-content: flex-end; }
+
+  /* Tier */
+  .tier-grid { display: flex; flex-direction: column; gap: 8px; }
+  .tier { display: grid; grid-template-columns: 72px 1fr; background: var(--bg); border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; }
+  .tier .label { display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: 800; letter-spacing: -0.03em; }
+  .tier.s .label { background: var(--accent); color: white; }
+  .tier.a .label { background: oklch(0.85 0.09 155); color: oklch(0.32 0.09 155); }
+  .tier.b .label { background: oklch(0.92 0.04 155); color: oklch(0.38 0.08 155); }
+  .tier.c .label { background: var(--bg-2); color: var(--ink-2); }
+  .tier.d .label { background: var(--ink); color: var(--bg); }
+  .tier .items { padding: 14px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .t-chip { display: inline-flex; align-items: center; gap: 8px; padding: 4px 10px 4px 4px; background: var(--bg-2); border: 1px solid var(--line); border-radius: 100px; font-size: 12px; }
+  .t-chip .a { width: 22px; height: 22px; border-radius: 50%; background: var(--bg); border: 1px solid var(--line); display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: var(--ink); letter-spacing: -0.02em; }
+  .t-chip .n { font-weight: 500; color: var(--ink); }
+  .t-chip .e { color: var(--ink-3); font-family: var(--mono); font-size: 10.5px; }
+
+  /* Share */
+  .share-layout { display: grid; grid-template-columns: 440px 1fr; gap: 48px; align-items: start; margin-top: 8px; }
+  .share-card { width: 440px; height: 560px; background: var(--bg); border: 1px solid var(--line); border-radius: 16px; padding: 28px; display: flex; flex-direction: column; position: relative; box-shadow: 0 30px 60px -30px rgba(0,0,0,.18); }
+  .share-card .tl { position: absolute; top: 18px; left: 22px; display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--ink-3); font-weight: 500; }
+  .share-card .tl .d { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+  .share-card .tr { position: absolute; top: 18px; right: 22px; font-family: var(--mono); font-size: 11px; color: var(--ink-3); }
+  .share-card h2 { font-size: 34px; font-weight: 800; letter-spacing: -0.035em; line-height: 1.02; margin: 52px 0 0; }
+  .share-card h2 em { font-style: normal; font-weight: 800; color: var(--accent); }
+  .share-card .sub { color: var(--ink-3); font-size: 13px; margin-top: 8px; }
+  .share-face { flex: 1; display: flex; align-items: center; justify-content: center; margin: 12px 0; }
+  .share-face .disc { width: 160px; height: 160px; border-radius: 50%; background: linear-gradient(135deg, color-mix(in oklch, var(--accent) 18%, var(--bg-2)), var(--bg-2)); display: flex; align-items: center; justify-content: center; font-size: 88px; font-weight: 800; letter-spacing: -0.04em; color: var(--ink); }
+  .share-stats { display: grid; grid-template-columns: repeat(3, 1fr); padding: 14px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .share-stats .cell { text-align: center; padding: 0 10px; border-right: 1px solid var(--line); }
+  .share-stats .cell:last-child { border-right: none; }
+  .share-stats .k { font-size: 11px; color: var(--ink-3); margin-bottom: 4px; }
+  .share-stats .v { font-size: 24px; font-weight: 800; letter-spacing: -0.03em; }
+  .share-stats .v.acc { color: var(--accent); font-weight: 800; }
+  .share-card .foot { margin-top: 12px; display: flex; justify-content: space-between; font-size: 12px; color: var(--ink-3); }
+
+  .share-actions { display: flex; flex-direction: column; gap: 10px; max-width: 340px; }
+  .share-actions h3 { font-size: 26px; font-weight: 800; letter-spacing: -0.03em; margin: 0 0 6px; }
+  .share-actions h3 em { font-style: normal; font-weight: 800; color: var(--accent); }
+  .share-actions p { color: var(--ink-3); margin: 0 0 12px; font-size: 13px; line-height: 1.5; }
+  .share-actions .btn { justify-content: space-between; }
+
+  /* About */
+  .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; max-width: 880px; margin: 0 auto; }
+  .about-grid p { font-size: 17px; line-height: 1.55; color: var(--ink-2); margin: 0 0 16px; }
+  .about-grid p em { font-style: normal; font-weight: 700; color: var(--accent); }
+  .faq { background: var(--bg); border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; }
+  .faq-item { padding: 16px 18px; border-bottom: 1px solid var(--line); }
+  .faq-item:last-child { border-bottom: none; }
+  .faq-item .q { font-size: 13px; font-weight: 600; color: var(--ink); margin-bottom: 4px; }
+  .faq-item .a { font-size: 13px; color: var(--ink-3); line-height: 1.5; }
+
+  /* Tweaks */
+  .tweaks { position: fixed; bottom: 20px; right: 20px; width: 260px; background: var(--bg); border: 1px solid var(--line); border-radius: var(--r); z-index: 100; box-shadow: 0 20px 40px -20px rgba(0,0,0,.18); font-size: 12px; display: none; }
+  .tweaks.on { display: block; }
+  .tweaks .hd { padding: 10px 14px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; font-weight: 500; color: var(--ink); }
+  .tweaks .bd { padding: 14px; display: flex; flex-direction: column; gap: 14px; }
+  .tw-group label { display: block; font-size: 11px; color: var(--ink-3); margin-bottom: 6px; font-weight: 500; }
+  .tw-opts { display: flex; flex-wrap: wrap; gap: 4px; }
+  .tw-opt { padding: 5px 9px; border-radius: 6px; background: var(--bg-2); border: 1px solid var(--line); color: var(--ink-2); cursor: pointer; font-size: 11px; }
+  .tw-opt.on { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+</style>
+</head>
+<body data-theme="light" data-accent="red">
+
+<nav class="top">
+  <div class="brand"><span class="dot"></span><span>rivyalry</span></div>
+  <div class="nav-links">
+    <button data-nav="vote" class="active">Vote</button>
+    <button data-nav="reveal">Reveal</button>
+    <button data-nav="leaderboard">Leaderboard</button>
+    <button data-nav="tier">Tiers</button>
+    <button data-nav="share">Share</button>
+    <button data-nav="about">About</button>
+  </div>
+  <div class="nav-right">
+    <div class="session"><span class="pulse"></span>1,284 voting now</div>
+    <button class="btn sm">Submit</button>
+    <button class="btn primary sm">Sign in</button>
+  </div>
+</nav>
+
+<div class="page">
+
+  <!-- VOTE -->
+  <section class="screen on" data-screen="vote" data-screen-label="01 Vote">
+    <div class="page-head">
+      <h1 class="title" id="vote-headline">Who's more <em>cracked?</em></h1>
+      <p class="subtitle">Compare two Ivy League profiles blind. Vote your gut. See who you actually picked.</p>
+    </div>
+
+    <div class="meta-row">
+      <div class="record">match <b>#12,847</b> · record <b>47–12</b></div>
+      <div class="streak-pill">🔥 9-vote streak</div>
+      <div class="record">both ~<b>1,540</b> Elo</div>
+    </div>
+
+    <div class="duel">
+      <div class="contender" data-side="A">
+        <div class="contender-head">
+          <div class="school-chip"><span class="sq" style="background: oklch(0.45 0.15 265);"></span>Princeton · '26</div>
+          <div class="side">A</div>
+        </div>
+        <div class="portrait"><span class="q">?</span></div>
+        <div class="stats">
+          <div class="cell"><div class="k">GPA</div><div class="v">3.9</div></div>
+          <div class="cell"><div class="k">Github</div><div class="v">2.4<span class="u">k</span></div></div>
+          <div class="cell"><div class="k">Raised</div><div class="v">$0</div></div>
+        </div>
+        <div class="creds">
+          <div class="cred"><div class="ico">JS</div><div><div class="l1">Jane Street</div><div class="l2">Quant Intern · Summer '25</div></div></div>
+          <div class="cred"><div class="ico">OR</div><div><div class="l1">Princeton ORFE</div><div class="l2">Teaching Assistant · 2 years</div></div></div>
+          <div class="cred"><div class="ico">PF</div><div><div class="l1">Putnam Fellow</div><div class="l2">Top 25 · Math Olympiad</div></div></div>
+        </div>
+      </div>
+      <div class="divider">vs</div>
+      <div class="contender" data-side="B">
+        <div class="contender-head">
+          <div class="school-chip"><span class="sq" style="background: oklch(0.55 0.14 230);"></span>Columbia · '26</div>
+          <div class="side">B</div>
+        </div>
+        <div class="portrait"><span class="q">?</span></div>
+        <div class="stats">
+          <div class="cell"><div class="k">GPA</div><div class="v">3.8</div></div>
+          <div class="cell"><div class="k">Github</div><div class="v">14<span class="u">k</span></div></div>
+          <div class="cell"><div class="k">Raised</div><div class="v">$1.2<span class="u">M</span></div></div>
+        </div>
+        <div class="creds">
+          <div class="cred"><div class="ico">DM</div><div><div class="l1">Google DeepMind</div><div class="l2">Research Intern · Summer '25</div></div></div>
+          <div class="cred"><div class="ico">AI</div><div><div class="l1">Columbia AI Lab</div><div class="l2">Research Assistant · 1.5 years</div></div></div>
+          <div class="cred"><div class="ico">YC</div><div><div class="l1">Y Combinator · W26</div><div class="l2">Co-founder · stealth infra</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn primary" data-vote="A">← Left wins <span class="kbd">A</span></button>
+      <button class="btn" data-vote="E">Equal <span class="kbd">E</span></button>
+      <button class="btn primary" data-vote="B">Right wins → <span class="kbd">L</span></button>
+      <button class="btn ghost" data-vote="S">Skip <span class="kbd">S</span></button>
+    </div>
+
+    <div class="footnote">seed a7f39b <span class="sep">·</span> <a href="#" style="color: var(--ink-2);">how ranking works</a> <span class="sep">·</span> <a href="#" style="color: var(--ink-2);">flag match</a></div>
+  </section>
+
+  <!-- REVEAL -->
+  <section class="screen" data-screen="reveal" data-screen-label="02 Reveal">
+    <div class="page-head">
+      <h1 class="title">You picked <em>the right one.</em></h1>
+      <p class="subtitle">62% of voters agreed with you this hour.</p>
+      <div class="reveal-pill">✓ <b>62%</b> picked B · matched the crowd · <b>+14</b> taste points</div>
+    </div>
+
+    <div class="duel">
+      <div class="contender">
+        <div class="contender-head">
+          <div class="school-chip"><span class="sq" style="background: oklch(0.45 0.15 265);"></span>Princeton · '26</div>
+          <div class="side">A</div>
+        </div>
+        <div class="portrait revealed"><span class="initial">J</span></div>
+        <p class="revealed-name">Jameson Ashford IV</p>
+        <div class="revealed-handle">@jashford</div>
+        <div class="stats">
+          <div class="cell"><div class="k">Elo</div><div class="v">1,522</div></div>
+          <div class="cell"><div class="k">Rank</div><div class="v">#34</div></div>
+          <div class="cell"><div class="k">Δ match</div><div class="v" style="color: var(--accent);">−18</div></div>
+        </div>
+        <div class="creds">
+          <div class="cred"><div class="ico">JS</div><div><div class="l1">Jane Street</div><div class="l2">Quant Intern · Summer '25</div></div></div>
+        </div>
+      </div>
+      <div class="divider" style="color: var(--good);">✓</div>
+      <div class="contender pick">
+        <div class="contender-head">
+          <div class="school-chip" style="border-color: var(--accent); color: var(--accent);"><span class="sq" style="background: var(--accent);"></span>Columbia · '26 · your pick</div>
+          <div class="side">B</div>
+        </div>
+        <div class="portrait revealed"><span class="initial">S</span></div>
+        <p class="revealed-name">Sana Malik</p>
+        <div class="revealed-handle">@sanabuilds · columbia.edu</div>
+        <div class="stats">
+          <div class="cell"><div class="k">Elo</div><div class="v" style="color: var(--accent);">1,558</div></div>
+          <div class="cell"><div class="k">Rank</div><div class="v">#21</div></div>
+          <div class="cell"><div class="k">Δ match</div><div class="v" style="color: var(--good);">+18</div></div>
+        </div>
+        <div class="creds">
+          <div class="cred"><div class="ico">YC</div><div><div class="l1">Y Combinator · W26</div><div class="l2">Co-founder · stealth infra</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn primary" data-nav="vote">Next match <span class="kbd">↵</span></button>
+      <button class="btn accent" data-nav="share">Share this</button>
+      <button class="btn ghost" data-nav="leaderboard">See leaderboard</button>
+    </div>
+    <div class="footnote">agreement with crowd <b style="color: var(--good);">78%</b> <span class="sep">·</span> streak <b style="color: var(--ink-2);">10</b></div>
+  </section>
+
+  <!-- LEADERBOARD -->
+  <section class="screen" data-screen="leaderboard" data-screen-label="03 Leaderboard">
+    <div class="page-head">
+      <h1 class="title">The <em>cracked</em> index.</h1>
+      <p class="subtitle">Top performers across the Ivy League, sorted by Elo. 247,812 votes this week.</p>
+    </div>
+    <div class="lb">
+      <div class="lb-filters">
+        <div class="chip-row">
+          <button class="chip on">All Ivies</button>
+          <button class="chip">Harvard</button>
+          <button class="chip">Yale</button>
+          <button class="chip">Princeton</button>
+          <button class="chip">Columbia</button>
+          <button class="chip">Penn</button>
+          <button class="chip">Brown</button>
+          <button class="chip">Cornell</button>
+          <button class="chip">Dartmouth</button>
+        </div>
+        <div class="chip-row">
+          <button class="chip on">All tracks</button>
+          <button class="chip">SWE</button>
+          <button class="chip">Founder</button>
+        </div>
+      </div>
+      <div class="lb-head">
+        <div>#</div>
+        <div>Contender</div>
+        <div>School</div>
+        <div>Elo</div>
+        <div>Win %</div>
+        <div>Δ 7d</div>
+        <div>Momentum</div>
+      </div>
+      <div id="lb-rows"></div>
+    </div>
+  </section>
+
+  <!-- TIER -->
+  <section class="screen" data-screen="tier" data-screen-label="04 Tiers">
+    <div class="page-head">
+      <h1 class="title">Tier list.</h1>
+      <p class="subtitle">Weekly snapshot, bucketed by Elo. Regenerated every night at 3am ET.</p>
+    </div>
+    <div class="tier-grid" id="tier-list"></div>
+    <div class="footnote" style="margin-top: 28px;">S requires Elo > 1800 and 100+ matches <span class="sep">·</span> listing ≠ endorsement <span class="sep">·</span> <a href="#" style="color: var(--ink-2);">opt out</a></div>
+  </section>
+
+  <!-- SHARE -->
+  <section class="screen" data-screen="share" data-screen-label="05 Share">
+    <div class="page-head">
+      <h1 class="title">Post the <em>receipts.</em></h1>
+      <p class="subtitle">Cards generate from your last 20 votes. Preview, tweak, ship.</p>
+    </div>
+    <div class="share-layout">
+      <div class="share-card">
+        <div class="tl"><span class="d"></span>rivyalry</div>
+        <div class="tr">CARD #00847</div>
+        <h2>I picked <em>Sana Malik</em><br>over the field.</h2>
+        <div class="sub">62% of voters agreed with me this week.</div>
+        <div class="share-face"><div class="disc">S</div></div>
+        <div class="share-stats">
+          <div class="cell"><div class="k">Votes</div><div class="v">62</div></div>
+          <div class="cell"><div class="k">Streak</div><div class="v acc">10</div></div>
+          <div class="cell"><div class="k">Agree</div><div class="v">78%</div></div>
+        </div>
+        <div class="foot"><span>rivyalry.com</span><span>@yourhandle</span></div>
+      </div>
+      <div class="share-actions">
+        <h3>Four ways to <em>post this.</em></h3>
+        <p>Every card pulls a real moment from your voting history. You approve before anything ships.</p>
+        <button class="btn primary">Post to X <span class="kbd">⌘↵</span></button>
+        <button class="btn">Instagram story</button>
+        <button class="btn">Download PNG · 1080×1350</button>
+        <button class="btn ghost">Copy share link</button>
+        <div style="margin-top: 18px;">
+          <div style="font-size: 11px; color: var(--ink-3); margin-bottom: 8px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; font-family: var(--mono);">Remix</div>
+          <div class="chip-row">
+            <button class="chip">my pick</button>
+            <button class="chip on">my record</button>
+            <button class="chip">my tier list</button>
+            <button class="chip">upset of the day</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section class="screen" data-screen="about" data-screen-label="06 About">
+    <div class="page-head">
+      <h1 class="title">What is <em>this?</em></h1>
+      <p class="subtitle">A head-to-head ranking of the most cracked software engineers and founders in the Ivy League.</p>
+    </div>
+    <div class="about-grid">
+      <div>
+        <p>Two Ivy profiles show up. Names hidden. You pick which one is more impressive on paper.</p>
+        <p>Every vote updates each person's <em>Elo rating.</em> Climb the leaderboard. Land on the tier list.</p>
+        <p>It's gimmicky and unserious. Everyone on here is extremely talented and extremely tired.</p>
+      </div>
+      <div class="faq">
+        <div class="faq-item"><div class="q">Who can be on here?</div><div class="a">Ivy undergrads + alumni within 2 years. SWE or founder track. Self-submitted or nominated.</div></div>
+        <div class="faq-item"><div class="q">How do I get added?</div><div class="a">Submit at rivyalry.com/submit. We verify via .edu email.</div></div>
+        <div class="faq-item"><div class="q">How do I get off?</div><div class="a">One email. No questions. Removed within 24 hours.</div></div>
+        <div class="faq-item"><div class="q">Is this fair?</div><div class="a">No. It's a popularity contest with stats. That's the whole bit.</div></div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<div class="tweaks" id="tweaks">
+  <div class="hd"><span>Tweaks</span><span style="color: var(--ink-3);">v2</span></div>
+  <div class="bd">
+    <div class="tw-group"><label>Theme</label>
+      <div class="tw-opts" data-tweak="theme">
+        <div class="tw-opt on" data-val="light">Light</div>
+        <div class="tw-opt" data-val="dark">Dark</div>
+      </div>
+    </div>
+    <div class="tw-group"><label>Accent</label>
+      <div class="tw-opts" data-tweak="accent">
+        <div class="tw-opt on" data-val="ivy">Ivy green</div>
+        <div class="tw-opt" data-val="forest">Forest</div>
+        <div class="tw-opt" data-val="ink">Ink</div>
+        <div class="tw-opt" data-val="red">Red</div>
+      </div>
+    </div>
+    <div class="tw-group"><label>Headline</label>
+      <div class="tw-opts" data-tweak="headline">
+        <div class="tw-opt on" data-val="cracked">Who's more cracked?</div>
+        <div class="tw-opt" data-val="cooking">Who's cooking?</div>
+        <div class="tw-opt" data-val="ships">Who ships harder?</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "theme": "light",
+  "accent": "forest",
+  "headline": "cracked"
+}/*EDITMODE-END*/;
+let tweaks = {...TWEAK_DEFAULTS};
+
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('on'));
+  document.querySelectorAll('.nav-links button').forEach(b => b.classList.remove('active'));
+  const el = document.querySelector(`.screen[data-screen="${name}"]`);
+  if (el) el.classList.add('on');
+  const btn = document.querySelector(`.nav-links button[data-nav="${name}"]`);
+  if (btn) btn.classList.add('active');
+  try { localStorage.setItem('rivyalry2:screen', name); } catch(e) {}
+  window.scrollTo({top: 0, behavior: 'instant'});
+}
+document.querySelectorAll('[data-nav]').forEach(b => b.addEventListener('click', () => showScreen(b.dataset.nav)));
+try { const s = localStorage.getItem('rivyalry2:screen'); if (s) showScreen(s); } catch(e) {}
+
+document.querySelectorAll('[data-vote]').forEach(b => b.addEventListener('click', () => showScreen('reveal')));
+document.addEventListener('keydown', e => {
+  const active = document.querySelector('.screen.on')?.dataset.screen;
+  if (active === 'vote') {
+    if (['a','A'].includes(e.key)) document.querySelector('[data-vote="A"]').click();
+    if (['l','L'].includes(e.key)) document.querySelector('[data-vote="B"]').click();
+    if (['e','E'].includes(e.key)) document.querySelector('[data-vote="E"]').click();
+    if (['s','S'].includes(e.key)) document.querySelector('[data-vote="S"]').click();
+  }
+  if (active === 'reveal' && e.key === 'Enter') showScreen('vote');
+});
+
+const leaders = [
+  { n: "Sana Malik", h: "@sanabuilds", sc: "Columbia", sw: "oklch(0.55 0.14 230)", tr: "CS '26 · Founder", el: 2184, w: 83, d: +41, sig: [2,1,3,2,4,3,5,4,5,6,7,8], hot: true },
+  { n: "Theo Okafor", h: "@theobuilds", sc: "Harvard", sw: "oklch(0.45 0.17 25)", tr: "CS '25 · SWE", el: 2147, w: 81, d: +28, sig: [5,4,3,4,5,5,6,5,6,7,7,7] },
+  { n: "Eliza Brennan", h: "@ebrennan", sc: "Yale", sw: "oklch(0.55 0.14 260)", tr: "CS '25 · Research", el: 2041, w: 77, d: +19, sig: [3,3,4,3,5,5,6,6,7,7,8,8] },
+  { n: "Rafael Kapur", h: "@rafk", sc: "Penn", sw: "oklch(0.55 0.14 235)", tr: "Wharton '26 · Founder", el: 1988, w: 74, d: -8, sig: [6,6,7,6,5,6,5,5,4,5,4,4] },
+  { n: "Jameson Ashford IV", h: "@jashford", sc: "Princeton", sw: "oklch(0.45 0.15 265);", tr: "ORFE '26 · SWE", el: 1944, w: 72, d: +3, sig: [5,5,5,6,5,5,5,6,5,6,6,5] },
+  { n: "Daisy Okoye", h: "@dokoye", sc: "Brown", sw: "oklch(0.55 0.14 55)", tr: "CS '27 · SWE", el: 1902, w: 70, d: +51, sig: [1,1,2,2,3,3,5,5,6,7,8,8], new: true },
+  { n: "Hiro Tanaka", h: "@hiro_t", sc: "Cornell", sw: "oklch(0.55 0.14 25)", tr: "CS '25 · SWE", el: 1871, w: 68, d: +11, sig: [4,4,5,5,4,5,5,6,6,5,6,6] },
+  { n: "Mira Acharya", h: "@miraac", sc: "Dartmouth", sw: "oklch(0.50 0.12 155)", tr: "CS '26 · SWE", el: 1822, w: 66, d: -4, sig: [6,5,5,6,5,4,5,4,4,3,4,4] },
+];
+function spark(arr, color) {
+  const w = 110, h = 26;
+  const mx = Math.max(...arr), mn = Math.min(...arr), r = mx - mn || 1;
+  const pts = arr.map((v,i) => `${(i/(arr.length-1))*w},${h - ((v-mn)/r)*h}`).join(' ');
+  return `<svg width="${w}" height="${h}"><polyline points="${pts}" fill="none" stroke="${color}" stroke-width="1.5" stroke-linejoin="round"/></svg>`;
+}
+function renderLB() {
+  document.getElementById('lb-rows').innerHTML = leaders.map((p,i) => {
+    const rank = i + 1;
+    const rankCls = rank === 1 ? 'top1' : '';
+    const deltaCls = p.d > 0 ? 'up' : p.d < 0 ? 'dn' : 'flat';
+    const deltaStr = p.d > 0 ? `↑ +${p.d}` : p.d < 0 ? `↓ ${p.d}` : '— 0';
+    const sparkColor = p.d > 0 ? 'oklch(0.62 0.14 150)' : p.d < 0 ? 'oklch(0.58 0.19 25)' : 'oklch(0.60 0.01 260)';
+    const hotChip = p.hot ? '<span class="tag hot">hot</span>' : '';
+    const newChip = p.new ? '<span class="tag new">new</span>' : '';
+    return `<div class="lb-row ${rankCls}">
+      <div class="rank">${String(rank).padStart(2,'0')}</div>
+      <div class="who"><div class="av">${p.n.charAt(0)}</div><div><div class="nm">${p.n}${hotChip}${newChip}</div><div class="sub">${p.h} · ${p.tr}</div></div></div>
+      <div><span class="school-chip"><span class="sq" style="background: ${p.sw}"></span>${p.sc}</span></div>
+      <div><span class="score">${p.el.toLocaleString()}</span></div>
+      <div><span class="winrate">${p.w}%</span></div>
+      <div><span class="delta ${deltaCls}">${deltaStr}</span></div>
+      <div class="spark">${spark(p.sig, sparkColor)}</div>
+    </div>`;
+  }).join('');
+}
+renderLB();
+
+const tiers = [
+  { k: 's', l: 'S', items: leaders.slice(0, 2) },
+  { k: 'a', l: 'A', items: leaders.slice(2, 5) },
+  { k: 'b', l: 'B', items: leaders.slice(5, 8) },
+  { k: 'c', l: 'C', items: [{n: '26 more', sc: '—', el: ''}] },
+  { k: 'd', l: 'D', items: [{n: 'redacted', sc: '—', el: ''}, {n: 'redacted', sc: '—', el: ''}] },
+];
+function renderTiers() {
+  document.getElementById('tier-list').innerHTML = tiers.map(t => `
+    <div class="tier ${t.k}"><div class="label">${t.l}</div>
+      <div class="items">${t.items.map(p => `<div class="t-chip"><span class="a">${p.n.charAt(0) === 'r' ? '•' : p.n.charAt(0)}</span><span class="n">${p.n}</span><span class="e">${p.sc}${p.el ? ' · ' + p.el : ''}</span></div>`).join('')}</div>
+    </div>`).join('');
+}
+renderTiers();
+
+const accentMap = {
+  ivy:    { a: 'oklch(0.42 0.09 155)', s: 'oklch(0.96 0.028 155)' },
+  forest: { a: 'oklch(0.35 0.11 150)', s: 'oklch(0.95 0.03 150)' },
+  ink:    { a: 'oklch(0.22 0.015 260)', s: 'oklch(0.93 0.005 260)' },
+  red:    { a: 'oklch(0.52 0.17 25)',  s: 'oklch(0.95 0.03 25)' },
+};
+function applyTweaks() {
+  document.body.dataset.theme = tweaks.theme;
+  const c = accentMap[tweaks.accent] || accentMap.red;
+  document.documentElement.style.setProperty('--accent', c.a);
+  document.documentElement.style.setProperty('--accent-soft', c.s);
+  const hl = document.getElementById('vote-headline');
+  if (hl) {
+    const map = {
+      cracked: "Who's more <em>cracked?</em>",
+      cooking: "Who's <em>cooking?</em>",
+      ships: "Who <em>ships</em> harder?"
+    };
+    hl.innerHTML = map[tweaks.headline] || map.cracked;
+  }
+  document.querySelectorAll('.tw-opts').forEach(g => {
+    const k = g.dataset.tweak;
+    g.querySelectorAll('.tw-opt').forEach(o => o.classList.toggle('on', o.dataset.val === tweaks[k]));
+  });
+}
+document.querySelectorAll('.tw-opt').forEach(o => o.addEventListener('click', () => {
+  const k = o.parentElement.dataset.tweak;
+  tweaks[k] = o.dataset.val;
+  applyTweaks();
+  try { window.parent.postMessage({type: '__edit_mode_set_keys', edits: {[k]: o.dataset.val}}, '*'); } catch(e) {}
+}));
+window.addEventListener('message', e => {
+  const d = e.data || {};
+  if (d.type === '__activate_edit_mode') document.getElementById('tweaks').classList.add('on');
+  else if (d.type === '__deactivate_edit_mode') document.getElementById('tweaks').classList.remove('on');
+});
+try { window.parent.postMessage({type: '__edit_mode_available'}, '*'); } catch(e) {}
+applyTweaks();
+</script>
+</body>
+</html>

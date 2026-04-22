@@ -5,8 +5,8 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --color-cornell-red: oklch(0.52 0.22 25);
-  --color-cornell-red-light: oklch(0.62 0.18 25);
+  --color-ivy-crimson: oklch(0.52 0.22 25);
+  --color-ivy-crimson-light: oklch(0.62 0.18 25);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;

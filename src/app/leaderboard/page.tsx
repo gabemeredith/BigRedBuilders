@@ -7,7 +7,7 @@ export default function LeaderboardPage() {
       <div className="text-center">
         <h1 className="text-3xl font-bold tracking-tight">Leaderboard</h1>
         <p className="mt-1 text-muted-foreground">
-          The definitive Big Red hierarchy.
+          The definitive Ivy League hierarchy.
         </p>
       </div>
       <Leaderboard players={players} />

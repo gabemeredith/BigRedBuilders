@@ -30,66 +30,45 @@ function pickPair(players: Player[], prevIds?: [string, string]): [Player, Playe
 }
 
 export function VoteArena({ players, experiences }: VoteArenaProps) {
-  const [pair, setPair] = useState<[Player, Player]>(() => pickPair(players));
+  const [pair, setPair] = useState<[Player, Player] | null>(null);
   const [revealed, setRevealed] = useState(false);
+
+  useEffect(() => {
+    setPair(pickPair(players));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const [matchKey, setMatchKey] = useState(0);
   const [lastVote, setLastVote] = useState<VoteResult | null>(null);
 
   const leftExperiences = useMemo(
-    () => experiences.filter((e) => e.playerId === pair[0].id),
+    () => pair ? experiences.filter((e) => e.playerId === pair[0].id) : [],
     [experiences, pair]
   );
   const rightExperiences = useMemo(
-    () => experiences.filter((e) => e.playerId === pair[1].id),
+    () => pair ? experiences.filter((e) => e.playerId === pair[1].id) : [],
     [experiences, pair]
   );
 
   const handleVote = useCallback(
     (result: VoteResult) => {
-      if (revealed) return;
+      if (revealed || !pair) return;
       setLastVote(result);
       setRevealed(true);
 
       // After reveal, load next pair
       setTimeout(() => {
-        setPair((prev) => pickPair(players, [prev[0].id, prev[1].id]));
+        setPair((prev) => prev ? pickPair(players, [prev[0].id, prev[1].id]) : pickPair(players));
         setRevealed(false);
         setLastVote(null);
         setMatchKey((k) => k + 1);
       }, 2000);
     },
-    [revealed, players]
+    [revealed, pair, players]
   );
 
-  // Keyboard shortcuts
-  useEffect(() => {
-    function onKeyDown(e: KeyboardEvent) {
-      if (revealed) return;
-      const target = e.target as HTMLElement;
-      if (target.tagName === "INPUT" || target.tagName === "TEXTAREA") return;
-
-      switch (e.key.toLowerCase()) {
-        case "a":
-          handleVote("left");
-          break;
-        case "l":
-          handleVote("right");
-          break;
-        case "e":
-          handleVote("equal");
-          break;
-        case "s":
-          handleVote("skip");
-          break;
-      }
-    }
-
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [handleVote, revealed]);
-
   const voteLabel =
-    lastVote === "left"
+    !pair ? null
+    : lastVote === "left"
       ? `${pair[0].name} wins!`
       : lastVote === "right"
         ? `${pair[1].name} wins!`
@@ -98,6 +77,33 @@ export function VoteArena({ players, experiences }: VoteArenaProps) {
           : lastVote === "skip"
             ? "Skipped"
             : null;
+
+  if (!pair) {
+    return (
+      <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
+        {[0, 1].map((i) => (
+          <div key={i} className="flex w-full flex-col items-center gap-5 rounded-2xl border border-border bg-card p-8 shadow-sm animate-pulse">
+            <div className="size-32 rounded-full bg-muted" />
+            <div className="flex flex-col items-center gap-2">
+              <div className="h-7 w-36 rounded-md bg-muted" />
+              <div className="h-5 w-48 rounded-md bg-muted" />
+            </div>
+            <div className="flex w-full flex-col gap-3">
+              {[1, 2].map((j) => (
+                <div key={j} className="flex items-center gap-3">
+                  <div className="size-9 shrink-0 rounded-lg bg-muted" />
+                  <div className="flex flex-col gap-1.5">
+                    <div className="h-4 w-28 rounded bg-muted" />
+                    <div className="h-3.5 w-20 rounded bg-muted" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div className="flex w-full flex-col items-center gap-6">
@@ -116,12 +122,14 @@ export function VoteArena({ players, experiences }: VoteArenaProps) {
             experiences={leftExperiences}
             revealed={revealed}
             side="left"
+            onClick={revealed ? undefined : () => handleVote("left")}
           />
           <ProfileCard
             player={pair[1]}
             experiences={rightExperiences}
             revealed={revealed}
             side="right"
+            onClick={revealed ? undefined : () => handleVote("right")}
           />
         </motion.div>
       </AnimatePresence>
@@ -136,7 +144,7 @@ export function VoteArena({ players, experiences }: VoteArenaProps) {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
               transition={{ duration: 0.25 }}
-              className="text-sm font-semibold text-cornell-red"
+              className="text-sm font-semibold text-ivy-crimson"
             >
               {voteLabel}
             </motion.p>
@@ -147,16 +155,6 @@ export function VoteArena({ players, experiences }: VoteArenaProps) {
       {/* Controls */}
       <VoteControls onVote={handleVote} disabled={revealed} />
 
-      {/* Shortcut hint */}
-      <p className="text-xs text-muted-foreground">
-        Keyboard: <kbd className="rounded bg-muted px-1 py-0.5 font-mono text-[10px]">A</kbd> left
-        {" · "}
-        <kbd className="rounded bg-muted px-1 py-0.5 font-mono text-[10px]">L</kbd> right
-        {" · "}
-        <kbd className="rounded bg-muted px-1 py-0.5 font-mono text-[10px]">E</kbd> equal
-        {" · "}
-        <kbd className="rounded bg-muted px-1 py-0.5 font-mono text-[10px]">S</kbd> skip
-      </p>
     </div>
   );
 }

@@ -3,9 +3,9 @@ import { Navbar } from "@/components/Navbar";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Big Red Rankings — Who's more cracked?",
+  title: "Rank the rIVYalry — Who's the most cracked Ivy builder?",
   description:
-    "Vote head-to-head on who's more cracked at Cornell. A playful social ranking game.",
+    "Vote head-to-head on who's more cracked across the Ivy League.",
 };
 
 export default function RootLayout({

@@ -4,9 +4,9 @@ export function Disclaimer() {
       <h2 className="text-sm font-semibold">The fine print</h2>
       <div className="space-y-3 text-sm leading-relaxed text-muted-foreground">
         <p>
-          Big Red Rankings is a student-built social game. It is not affiliated
-          with, endorsed by, or representative of Cornell University, any
-          employer, or any organization listed on player profiles.
+          Ivy Builder Rankings is a student-built social game. It is not
+          affiliated with, endorsed by, or representative of any Ivy League
+          university, employer, or organization listed on player profiles.
         </p>
         <p>
           Rankings are generated entirely by anonymous peer votes and reflect
@@ -20,8 +20,8 @@ export function Disclaimer() {
       </div>
       <div className="pt-2">
         <a
-          href="mailto:rankings@cornell.edu"
-          className="text-sm font-medium text-cornell-red underline-offset-4 hover:underline"
+          href="mailto:gabriel.b.meredith@gmail.com"
+          className="text-sm font-medium text-ivy-crimson underline-offset-4 hover:underline"
         >
           Contact us →
         </a>

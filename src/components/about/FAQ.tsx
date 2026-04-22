@@ -37,7 +37,7 @@ const faqs = [
   {
     question: "Is this just for CS majors?",
     answer:
-      "No. Anyone at Cornell can be ranked. CS, ORIE, Dyson, Hotel, Arts & Sciences — crackedness transcends colleges.",
+      "No. Any builder at an Ivy League school can be ranked. CS, quant, startup founders, researchers — crackedness transcends majors and schools.",
   },
 ];
 

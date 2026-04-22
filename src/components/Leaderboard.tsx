@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Player } from "@/types";
+import { Player, IvySchool } from "@/types";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -15,6 +15,7 @@ import {
 import { cn } from "@/lib/utils";
 
 const ALL_TAGS = ["SWE", "Quant", "Startup", "AI", "Research"] as const;
+const ALL_SCHOOLS: IvySchool[] = ["Brown", "Columbia", "Cornell", "Dartmouth", "Harvard", "Penn", "Princeton", "Yale"];
 
 type SortKey = "rating" | "wins" | "losses" | "winrate";
 
@@ -34,6 +35,7 @@ function winRate(p: Player) {
 export function Leaderboard({ players }: { players: Player[] }) {
   const [search, setSearch] = useState("");
   const [activeTag, setActiveTag] = useState<string | null>(null);
+  const [activeSchool, setActiveSchool] = useState<IvySchool | null>(null);
   const [sortKey, setSortKey] = useState<SortKey>("rating");
 
   const filtered = useMemo(() => {
@@ -51,6 +53,10 @@ export function Leaderboard({ players }: { players: Player[] }) {
 
     if (activeTag) {
       result = result.filter((p) => p.tags?.includes(activeTag));
+    }
+
+    if (activeSchool) {
+      result = result.filter((p) => p.school === activeSchool);
     }
 
     result.sort((a, b) => {
@@ -95,6 +101,27 @@ export function Leaderboard({ players }: { players: Player[] }) {
         </Select>
       </div>
 
+      {/* School filters */}
+      <div className="flex flex-wrap gap-2">
+        <Badge
+          variant={activeSchool === null ? "default" : "outline"}
+          className="cursor-pointer"
+          onClick={() => setActiveSchool(null)}
+        >
+          All Schools
+        </Badge>
+        {ALL_SCHOOLS.map((school) => (
+          <Badge
+            key={school}
+            variant={activeSchool === school ? "default" : "outline"}
+            className="cursor-pointer"
+            onClick={() => setActiveSchool(activeSchool === school ? null : school)}
+          >
+            {school}
+          </Badge>
+        ))}
+      </div>
+
       {/* Tag filters */}
       <div className="flex flex-wrap gap-2">
         <Badge
@@ -102,7 +129,7 @@ export function Leaderboard({ players }: { players: Player[] }) {
           className="cursor-pointer"
           onClick={() => setActiveTag(null)}
         >
-          All
+          All Tags
         </Badge>
         {ALL_TAGS.map((tag) => (
           <Badge
@@ -127,6 +154,9 @@ export function Leaderboard({ players }: { players: Player[] }) {
                 </th>
                 <th className="px-4 py-3 text-left font-medium text-muted-foreground">
                   Player
+                </th>
+                <th className="px-4 py-3 text-left font-medium text-muted-foreground">
+                  School
                 </th>
                 <th className="px-4 py-3 text-left font-medium text-muted-foreground">
                   Tags
@@ -179,6 +209,11 @@ export function Leaderboard({ players }: { players: Player[] }) {
                         </div>
                       </div>
                     </div>
+                  </td>
+                  <td className="px-4 py-3">
+                    <span className="text-xs font-semibold text-ivy-crimson uppercase tracking-wide">
+                      {player.school}
+                    </span>
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex gap-1">
@@ -249,8 +284,14 @@ export function Leaderboard({ players }: { players: Player[] }) {
                     {player.rating}
                   </span>
                 </div>
-                <div className="text-xs text-muted-foreground truncate">
-                  {player.descriptor}
+                <div className="flex items-center gap-1.5">
+                  <span className="text-xs font-semibold text-ivy-crimson uppercase tracking-wide shrink-0">
+                    {player.school}
+                  </span>
+                  <span className="text-xs text-muted-foreground/50">·</span>
+                  <span className="text-xs text-muted-foreground truncate">
+                    {player.descriptor}
+                  </span>
                 </div>
                 <div className="mt-2 flex items-center justify-between">
                   <div className="flex gap-1">

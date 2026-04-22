@@ -4,16 +4,16 @@
 ---
 
 ## Product Summary
-A playful web app where users compare Cornell students head-to-head and vote on who is more cracked. Funny, polished, competitive, and socially shareable. Each vote updates player ratings, the campus leaderboard, and matchup balancing. Light-hearted social game — not a serious ranking.
+A playful web app where users compare Ivy League students head-to-head and vote on who is more cracked. Funny, polished, competitive, and socially shareable. Each vote updates player ratings, the campus leaderboard, and matchup balancing. Light-hearted social game — not a serious ranking.
 
 **Vision:** Students send it to friends, argue over rankings, screenshot the leaderboard, and keep coming back to vote.
 
-**Why it exists:** Cornell students love comparing prestige and crackedness — but there's no clean, addictive product built around it. This fills that gap.
+**Why it exists:** Ivy League students love comparing prestige and crackedness — but there's no clean, addictive product built around it. This fills that gap.
 
 ---
 
 ## Target Users
-- **Primary:** Cornell undergrads (CS, ORIE, ECE, quant, startup, builder culture)
+- **Primary:** Ivy League undergrads (CS, ORIE, ECE, quant, startup, builder culture)
 - **Secondary:** Friends of listed students, clubs, alumni browsing for fun
 
 ---
@@ -24,7 +24,7 @@ A playful web app where users compare Cornell students head-to-head and vote on 
 3. **Polished** — real and spreadable
 4. **Shareable** — leaderboard is screenshot-worthy
 5. **Light-hearted** — never feels malicious or defamatory
-6. **Cornell-native** — built for Cornell students, not generic
+6. **Ivy League-native** — built for Ivy League students, not generic
 
 ---
 
@@ -37,7 +37,7 @@ A playful web app where users compare Cornell students head-to-head and vote on 
 
 ### Vote Page *(most important)*
 - Two player cards: hidden on load → revealed on interaction → vote → next round
-- Each card: profile photo, name, Cornell affiliation, rating, experience list, optional headline
+- Each card: profile photo, name, Ivy League affiliation, rating, experience list, optional headline
 - Experience list: company logo, role title, company name; optional "See More" expansion
 - Vote options: Left wins / Right wins / Equal / Skip
 - Keyboard shortcuts: `A` left, `L` right, `E` equal, `S` skip
@@ -70,7 +70,7 @@ A playful web app where users compare Cornell students head-to-head and vote on 
 
 ## Content Model
 
-**Player:** name, Cornell descriptor, photo, headline, rating, wins/losses/ties, exposure count, active/hidden status
+**Player:** name, Ivy League descriptor, photo, headline, rating, wins/losses/ties, exposure count, active/hidden status
 
 **Experience:** company name, logo, role title, sort order
 
@@ -79,7 +79,7 @@ A playful web app where users compare Cornell students head-to-head and vote on 
 ---
 
 ## Design Requirements
-- Color palette: off-white/light-gray background, near-black text, Cornell red accent
+- Color palette: off-white/light-gray background, near-black text, Ivy League red accent
 - Vote page: two large side-by-side cards, clear action area, strong hierarchy and spacing
 - Leaderboard: clean table/card, easy scan, screenshot-friendly
 - About: short sections, clean hierarchy, not a wall of text
@@ -87,7 +87,7 @@ A playful web app where users compare Cornell students head-to-head and vote on 
 ---
 
 ## Copy Style
-Witty, internet-native, concise, self-aware. *"Who's more cracked?" / "Settle the Cornell hierarchy." / "Big Red bragging rights are on the line."*
+Witty, internet-native, concise, self-aware. *"Who's more cracked?" / "Settle the Ivy League hierarchy." / "Big Red bragging rights are on the line."*
 **Avoid:** cruelty, defamatory language, claims of objective superiority.
 
 ---
@@ -121,4 +121,4 @@ Comments, messaging, analytics dashboards, heavy admin tooling, full moderation,
 
 ---
 
-**Final standard:** Polished Cornell-built project — a little elite, a little absurd, very shareable. If students immediately drop it in group chats, it's working.
+**Final standard:** Polished Ivy League-built project — a little elite, a little absurd, very shareable. If students immediately drop it in group chats, it's working.

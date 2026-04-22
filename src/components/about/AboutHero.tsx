@@ -1,17 +1,17 @@
 export function AboutHero() {
   return (
     <section className="space-y-4">
-      <p className="text-sm font-medium tracking-widest uppercase text-cornell-red">
+      <p className="text-sm font-medium tracking-widest uppercase text-ivy-crimson">
         The Definitive* Source
       </p>
       <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
         Who&apos;s more cracked?
       </h1>
       <p className="text-lg leading-relaxed text-muted-foreground">
-        Big Red Rankings is a head-to-head voting game for Cornell students.
-        Two profiles show up. You pick who&apos;s more cracked — or call it a
-        tie, or skip. That&apos;s it. Votes feed an ELO rating system, and a
-        live leaderboard settles the discourse once and for all.
+        Ivy Builder Rankings is a head-to-head voting game for Ivy League
+        builders. Two profiles show up. You pick who&apos;s more cracked — or
+        call it a tie, or skip. That&apos;s it. Votes feed an ELO rating
+        system, and a live leaderboard settles the discourse once and for all.
       </p>
       <p className="text-lg leading-relaxed text-muted-foreground">
         It&apos;s not a job board. It&apos;s not a LinkedIn replacement. It&apos;s

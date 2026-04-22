@@ -11,6 +11,7 @@ interface ProfileCardProps {
   experiences: Experience[];
   revealed: boolean;
   side: "left" | "right";
+  onClick?: () => void;
 }
 
 export function ProfileCard({
@@ -18,13 +19,16 @@ export function ProfileCard({
   experiences,
   revealed,
   side,
+  onClick,
 }: ProfileCardProps) {
   return (
     <motion.div
       layout
+      onClick={onClick}
       className={cn(
         "relative flex w-full flex-col items-center gap-5 rounded-2xl border border-border bg-card p-8 shadow-sm",
-        "overflow-hidden"
+        "overflow-hidden",
+        onClick && "cursor-pointer hover:border-foreground/20 hover:shadow-md transition-shadow"
       )}
     >
       {/* Avatar */}
@@ -91,35 +95,17 @@ export function ProfileCard({
         </AnimatePresence>
       </div>
 
-      {/* Experiences */}
-      <AnimatePresence mode="wait">
-        {revealed ? (
-          <motion.div
-            key="experiences"
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.35, delay: 0.2 }}
-            className="w-full"
-          >
-            <ExperienceList experiences={experiences} />
-          </motion.div>
-        ) : (
-          <motion.div
-            key="hidden-experiences"
-            className="flex w-full flex-col gap-2"
-          >
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="flex items-center gap-3">
-                <div className="size-9 shrink-0 rounded-lg bg-muted" />
-                <div className="flex flex-col gap-1.5">
-                  <div className="h-4 w-28 rounded bg-muted" />
-                  <div className="h-3.5 w-20 rounded bg-muted" />
-                </div>
-              </div>
-            ))}
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Experiences — always visible; identity is what's hidden */}
+      <div className="w-full">
+        <ExperienceList experiences={experiences} />
+      </div>
+
+      {/* School badge — always visible */}
+      <div className="absolute top-3 left-3">
+        <span className="rounded-full bg-ivy-crimson/10 px-2 py-0.5 text-xs font-semibold text-ivy-crimson uppercase tracking-wide">
+          {player.school}
+        </span>
+      </div>
 
       {/* Side indicator */}
       <div className="absolute top-3 right-3">

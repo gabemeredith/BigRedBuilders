@@ -3,7 +3,7 @@ const steps = [
     number: "01",
     title: "Two profiles appear",
     description:
-      "You see two Cornell students side by side — name, affiliation, experience, the works. Identities are hidden at first for dramatic effect.",
+      "You see two Ivy League builders side by side — name, school, experience, the works. Identities are hidden at first for dramatic effect.",
   },
   {
     number: "02",

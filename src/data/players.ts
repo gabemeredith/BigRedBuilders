@@ -1,10 +1,11 @@
-import { Player } from "@/types";
+import { Player, Experience } from "@/types";
 
 export const players: Player[] = [
   {
     id: "1",
     name: "Marcus Chen",
-    descriptor: "CS '26 · College of Engineering",
+    school: "Harvard",
+    descriptor: "CS '26 · John A. Paulson SEAS",
     photo: "/avatars/marcus.jpg",
     headline: "Built a compiler in Rust for fun",
     rating: 1847,
@@ -19,7 +20,8 @@ export const players: Player[] = [
   {
     id: "2",
     name: "Priya Patel",
-    descriptor: "ORIE '25 · College of Engineering",
+    school: "Princeton",
+    descriptor: "ORFE '25 · School of Engineering",
     photo: "/avatars/priya.jpg",
     headline: "Jane Street intern, competitive math",
     rating: 1792,
@@ -34,7 +36,8 @@ export const players: Player[] = [
   {
     id: "3",
     name: "Jake Morrison",
-    descriptor: "CS '27 · College of Arts & Sciences",
+    school: "Yale",
+    descriptor: "CS '27 · Yale School of Engineering",
     photo: "/avatars/jake.jpg",
     headline: "Dropped out, raised $2M, came back",
     rating: 1731,
@@ -49,7 +52,8 @@ export const players: Player[] = [
   {
     id: "4",
     name: "Sophia Kim",
-    descriptor: "ECE '26 · College of Engineering",
+    school: "Columbia",
+    descriptor: "ECE '26 · Fu Foundation SEAS",
     photo: "/avatars/sophia.jpg",
     headline: "Published 3 NeurIPS papers as undergrad",
     rating: 1685,
@@ -64,7 +68,8 @@ export const players: Player[] = [
   {
     id: "5",
     name: "David Okafor",
-    descriptor: "CS '25 · College of Engineering",
+    school: "Brown",
+    descriptor: "CS '25 · School of Engineering",
     photo: "/avatars/david.jpg",
     headline: "Open source maintainer, 5k+ GitHub stars",
     rating: 1623,
@@ -79,6 +84,7 @@ export const players: Player[] = [
   {
     id: "6",
     name: "Emily Zhang",
+    school: "Cornell",
     descriptor: "Math '26 · College of Arts & Sciences",
     photo: "/avatars/emily.jpg",
     headline: "Putnam Fellow, IMO gold medalist",
@@ -94,7 +100,8 @@ export const players: Player[] = [
   {
     id: "7",
     name: "Ryan Torres",
-    descriptor: "Info Sci '27 · College of Computing",
+    school: "Penn",
+    descriptor: "CS '27 · School of Engineering & Applied Science",
     photo: "/avatars/ryan.jpg",
     headline: "YC W25, building AI dev tools",
     rating: 1544,
@@ -109,7 +116,8 @@ export const players: Player[] = [
   {
     id: "8",
     name: "Aisha Rahman",
-    descriptor: "CS '26 · College of Engineering",
+    school: "Dartmouth",
+    descriptor: "CS '26 · Thayer School of Engineering",
     photo: "/avatars/aisha.jpg",
     headline: "Google STEP → Meta → now doing research",
     rating: 1510,
@@ -124,7 +132,8 @@ export const players: Player[] = [
   {
     id: "9",
     name: "Leo Nakamura",
-    descriptor: "AEP '25 · College of Engineering",
+    school: "Princeton",
+    descriptor: "Applied Physics '25 · School of Engineering",
     photo: "/avatars/leo.jpg",
     headline: "Quantum computing research at IBM",
     rating: 1472,
@@ -139,7 +148,8 @@ export const players: Player[] = [
   {
     id: "10",
     name: "Chloe Bennett",
-    descriptor: "CS '27 · Dyson School",
+    school: "Yale",
+    descriptor: "CS + Economics '27 · Yale College",
     photo: "/avatars/chloe.jpg",
     headline: "Sold first startup at 19, CS + Business",
     rating: 1435,
@@ -151,4 +161,27 @@ export const players: Player[] = [
     isHidden: false,
     tags: ["Startup", "SWE"],
   },
+];
+
+export const experiences: Experience[] = [
+  { id: "e1", playerId: "1", companyName: "Apple", companyDomain: "apple.com", roleTitle: "SWE Intern", sortOrder: 0 },
+  { id: "e2", playerId: "1", companyName: "Harvard CS", companyDomain: "seas.harvard.edu", roleTitle: "Research Assistant", sortOrder: 1 },
+  { id: "e3", playerId: "2", companyName: "Jane Street", companyDomain: "janestreet.com", roleTitle: "Quant Intern", sortOrder: 0 },
+  { id: "e4", playerId: "2", companyName: "Princeton ORFE", companyDomain: "princeton.edu", roleTitle: "Teaching Assistant", sortOrder: 1 },
+  { id: "e5", playerId: "3", companyName: "Self-funded Startup", roleTitle: "Co-founder & CEO", sortOrder: 0 },
+  { id: "e6", playerId: "3", companyName: "Andreessen Horowitz", companyDomain: "a16z.com", roleTitle: "a16z Scout", sortOrder: 1 },
+  { id: "e7", playerId: "4", companyName: "Google DeepMind", companyDomain: "deepmind.google", roleTitle: "Research Intern", sortOrder: 0 },
+  { id: "e8", playerId: "4", companyName: "Columbia AI Lab", companyDomain: "columbia.edu", roleTitle: "Research Assistant", sortOrder: 1 },
+  { id: "e9", playerId: "5", companyName: "Cloudflare", companyDomain: "cloudflare.com", roleTitle: "SWE Intern", sortOrder: 0 },
+  { id: "e10", playerId: "5", companyName: "Open Source", roleTitle: "Maintainer", sortOrder: 1 },
+  { id: "e11", playerId: "6", companyName: "Two Sigma", companyDomain: "twosigma.com", roleTitle: "Quant Research Intern", sortOrder: 0 },
+  { id: "e12", playerId: "6", companyName: "Cornell Math", companyDomain: "math.cornell.edu", roleTitle: "Putnam Team Captain", sortOrder: 1 },
+  { id: "e13", playerId: "7", companyName: "YC W25 Startup", companyDomain: "ycombinator.com", roleTitle: "Co-founder & CTO", sortOrder: 0 },
+  { id: "e14", playerId: "7", companyName: "Microsoft", companyDomain: "microsoft.com", roleTitle: "SWE Intern", sortOrder: 1 },
+  { id: "e15", playerId: "8", companyName: "Meta", companyDomain: "meta.com", roleTitle: "SWE Intern", sortOrder: 0 },
+  { id: "e16", playerId: "8", companyName: "Google", companyDomain: "google.com", roleTitle: "STEP Intern", sortOrder: 1 },
+  { id: "e17", playerId: "9", companyName: "IBM Research", companyDomain: "ibm.com", roleTitle: "Quantum Computing Intern", sortOrder: 0 },
+  { id: "e18", playerId: "9", companyName: "Princeton Physics", companyDomain: "princeton.edu", roleTitle: "Lab Researcher", sortOrder: 1 },
+  { id: "e19", playerId: "10", companyName: "Acquired Startup", roleTitle: "Founder", sortOrder: 0 },
+  { id: "e20", playerId: "10", companyName: "Sequoia Capital", companyDomain: "sequoiacap.com", roleTitle: "Scout", sortOrder: 1 },
 ];

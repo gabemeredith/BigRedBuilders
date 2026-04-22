@@ -14,12 +14,13 @@ export function ExperienceList({ experiences }: ExperienceListProps) {
     <ul className="flex flex-col gap-3">
       {sorted.map((exp) => (
         <li key={exp.id} className="flex items-center gap-3">
-          <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-muted">
-            {exp.companyLogo ? (
+          <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-muted overflow-hidden">
+            {exp.companyLogo || exp.companyDomain ? (
               <img
-                src={exp.companyLogo}
+                src={exp.companyLogo ?? `https://www.google.com/s2/favicons?domain=${exp.companyDomain}&sz=64`}
                 alt={exp.companyName}
                 className="size-5 object-contain"
+                onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
               />
             ) : (
               <Building2 className="size-4 text-muted-foreground" />
