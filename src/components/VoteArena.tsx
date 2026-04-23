@@ -25,16 +25,11 @@ function getSessionId(): string {
   return id;
 }
 
-function randomAgreement() {
-  return Math.floor(Math.random() * 26) + 52; // 52–78
-}
-
 export function VoteArena() {
   const [matchup, setMatchup] = useState<Matchup | null>(null);
   const [phase, setPhase] = useState<"voting" | "revealed">("voting");
   const [matchKey, setMatchKey] = useState(0);
   const [lastVote, setLastVote] = useState<VoteResult | null>(null);
-  const [agreement, setAgreement] = useState(62);
   const [copied, setCopied] = useState(false);
   const [loadError, setLoadError] = useState(false);
 
@@ -75,7 +70,6 @@ export function VoteArena() {
     async (result: VoteResult) => {
       if (phase === "revealed" || !matchup) return;
       setLastVote(result);
-      setAgreement(randomAgreement());
       setPhase("revealed");
 
       // Fire-and-forget — submit vote to backend
@@ -200,12 +194,6 @@ export function VoteArena() {
           >
             <div className="flex flex-col items-center gap-1.5 text-center">
               <p className="text-xl font-black tracking-tight">{revealHeadline}</p>
-              {lastVote !== "skip" && (
-                <p className="font-mono text-sm text-muted-foreground">
-                  <span className="font-semibold text-foreground">{agreement}%</span> of voters agreed
-                  {lastVote !== "equal" && <span className="text-ivy-accent font-mono text-xs ml-2">+14 taste pts</span>}
-                </p>
-              )}
             </div>
 
             <div className="flex flex-wrap items-center justify-center gap-2">
