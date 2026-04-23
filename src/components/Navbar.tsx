@@ -55,14 +55,6 @@ export function Navbar() {
           )}
         </div>
 
-        {/* Live counter */}
-        <div className="flex items-center gap-2 font-mono text-xs text-muted-foreground">
-          <span className="relative flex size-1.5">
-            <span className="absolute inline-flex size-full animate-ping rounded-full bg-ivy-accent opacity-60" />
-            <span className="relative inline-flex size-1.5 rounded-full bg-ivy-accent" />
-          </span>
-          <span>847 voting now</span>
-        </div>
       </div>
     </nav>
   );
