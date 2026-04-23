@@ -8,7 +8,7 @@ export function AboutHero() {
         Who&apos;s more cracked?
       </h1>
       <p className="text-lg leading-relaxed text-muted-foreground">
-        Ivy Builder Rankings is a head-to-head voting game for Ivy League
+        Rivyalry is a head-to-head voting game for Ivy League
         builders. Two profiles show up. You pick who&apos;s more cracked — or
         call it a tie, or skip. That&apos;s it. Votes feed an ELO rating
         system, and a live leaderboard settles the discourse once and for all.

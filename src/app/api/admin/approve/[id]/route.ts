@@ -53,6 +53,20 @@ export async function POST(
     return NextResponse.json({ error: "Failed to create player" }, { status: 500 });
   }
 
+  // Insert experiences if any were submitted with the nomination
+  const rawExperiences = nom.experiences as { companyName: string; roleTitle: string; companyDomain?: string; sortOrder: number }[] | null;
+  if (rawExperiences && rawExperiences.length > 0) {
+    const expRows = rawExperiences.map((e) => ({
+      player_id: player.id,
+      company_name: e.companyName,
+      role_title: e.roleTitle,
+      company_domain: e.companyDomain ?? null,
+      sort_order: e.sortOrder,
+    }));
+    const { error: expError } = await supabase.from("experiences").insert(expRows);
+    if (expError) console.error("experiences insert error:", expError);
+  }
+
   // Mark nomination approved
   await supabase
     .from("nominations")

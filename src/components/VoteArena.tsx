@@ -1,9 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Player, Experience, VoteResult } from "@/types";
 import { ProfileCard } from "./ProfileCard";
-import { VoteControls } from "./VoteControls";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 
@@ -38,7 +37,6 @@ export function VoteArena() {
   const [agreement, setAgreement] = useState(62);
   const [copied, setCopied] = useState(false);
   const [loadError, setLoadError] = useState(false);
-  const nextRef = useRef<() => void>(() => {});
 
   const rankMap = useMemo(() => {
     // We only have two players in context, so just compare their ratings
@@ -73,8 +71,6 @@ export function VoteArena() {
     await loadMatchup();
   }, [loadMatchup]);
 
-  useEffect(() => { nextRef.current = advance; }, [advance]);
-
   const handleVote = useCallback(
     async (result: VoteResult) => {
       if (phase === "revealed" || !matchup) return;
@@ -95,23 +91,6 @@ export function VoteArena() {
     },
     [phase, matchup]
   );
-
-  // Keyboard shortcuts
-  useEffect(() => {
-    function onKey(e: KeyboardEvent) {
-      if (phase === "voting") {
-        if (e.key === "a" || e.key === "A") handleVote("left");
-        if (e.key === "l" || e.key === "L") handleVote("right");
-        if (e.key === "e" || e.key === "E") handleVote("equal");
-        if (e.key === "s" || e.key === "S") handleVote("skip");
-      }
-      if (phase === "revealed" && e.key === "Enter") {
-        nextRef.current();
-      }
-    }
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [phase, handleVote]);
 
   const handleShare = useCallback(async () => {
     try {
@@ -194,7 +173,6 @@ export function VoteArena() {
             player={matchup.left}
             experiences={matchup.left.experiences}
             revealed={phase === "revealed"}
-            side="left"
             rank={rankMap.get(matchup.left.id)}
             picked={phase === "revealed" && lastVote === "left"}
             onClick={phase === "voting" ? () => handleVote("left") : undefined}
@@ -203,7 +181,6 @@ export function VoteArena() {
             player={matchup.right}
             experiences={matchup.right.experiences}
             revealed={phase === "revealed"}
-            side="right"
             rank={rankMap.get(matchup.right.id)}
             picked={phase === "revealed" && lastVote === "right"}
             onClick={phase === "voting" ? () => handleVote("right") : undefined}
@@ -212,18 +189,7 @@ export function VoteArena() {
       </AnimatePresence>
 
       <AnimatePresence mode="wait">
-        {phase === "voting" ? (
-          <motion.div
-            key="controls"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.2 }}
-            className="flex w-full flex-col items-center gap-4"
-          >
-            <VoteControls onVote={handleVote} disabled={false} />
-          </motion.div>
-        ) : (
+        {phase === "revealed" && (
           <motion.div
             key="reveal"
             initial={{ opacity: 0, y: 10 }}
@@ -248,7 +214,6 @@ export function VoteArena() {
                 className="flex items-center gap-2 rounded-md bg-foreground px-4 py-2 text-sm font-bold text-background transition-colors hover:bg-foreground/85"
               >
                 Next match
-                <kbd className="rounded bg-background/15 px-1 py-0.5 font-mono text-[10px]">↵</kbd>
               </button>
               <button
                 onClick={handleShare}

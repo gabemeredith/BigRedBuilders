@@ -8,7 +8,7 @@ interface ExperienceListProps {
 }
 
 export function ExperienceList({ experiences }: ExperienceListProps) {
-  const sorted = [...experiences].sort((a, b) => a.sortOrder - b.sortOrder);
+  const sorted = [...experiences].sort((a, b) => a.sortOrder - b.sortOrder).slice(0, 3);
 
   return (
     <ul className="flex flex-col gap-2.5">

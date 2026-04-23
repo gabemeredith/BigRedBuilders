@@ -4,7 +4,7 @@ export function Disclaimer() {
       <h2 className="text-sm font-semibold">The fine print</h2>
       <div className="space-y-3 text-sm leading-relaxed text-muted-foreground">
         <p>
-          Ivy Builder Rankings is a student-built social game. It is not
+          Rivyalry is a student-built social game. It is not
           affiliated with, endorsed by, or representative of any Ivy League
           university, employer, or organization listed on player profiles.
         </p>
@@ -14,17 +14,15 @@ export function Disclaimer() {
           measures of intelligence, competence, character, or worth.
         </p>
         <p>
-          If you want your profile removed, reach out and we&apos;ll handle it
-          immediately. No hard feelings, no questions asked.
+          If you want your profile removed, email{" "}
+          <a
+            href="mailto:remove@rivyalry.com"
+            className="text-foreground underline underline-offset-2"
+          >
+            remove@rivyalry.com
+          </a>
+          {" "}and we&apos;ll handle it immediately. No hard feelings, no questions asked.
         </p>
-      </div>
-      <div className="pt-2">
-        <a
-          href="mailto:gabriel.b.meredith@gmail.com"
-          className="text-sm font-medium text-ivy-accent underline-offset-4 hover:underline"
-        >
-          Contact us →
-        </a>
       </div>
     </section>
   );

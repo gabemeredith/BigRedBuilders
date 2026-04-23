@@ -7,25 +7,43 @@ import { isIvyEduEmail, getIvySchoolFromEmail } from "@/lib/ivy-domains";
 
 const IVY_SCHOOLS: IvySchool[] = ["Brown", "Columbia", "Cornell", "Dartmouth", "Harvard", "Penn", "Princeton", "Yale"];
 
+type ExperienceSlot = {
+  companyName: string;
+  roleTitle: string;
+  companyDomain: string;
+};
+
 type FormState = {
   name: string;
   school: IvySchool | "";
   profileUrl: string;
+  photoUrl: string;
   nominator: string;
   eduEmail: string;
   descriptor: string;
   headline: string;
+  experiences: [ExperienceSlot, ExperienceSlot, ExperienceSlot];
 };
+
+const emptySlot = (): ExperienceSlot => ({ companyName: "", roleTitle: "", companyDomain: "" });
+
+// Strip protocol, www, and any path — keep just the bare domain
+function normalizeDomain(raw: string): string {
+  const stripped = raw.trim().replace(/^https?:\/\//i, "").replace(/^www\./i, "").split("/")[0].split("?")[0];
+  return stripped.toLowerCase();
+}
 
 export default function NominatePage() {
   const [form, setForm] = useState<FormState>({
     name: "",
     school: "",
     profileUrl: "",
+    photoUrl: "",
     nominator: "",
     eduEmail: "",
     descriptor: "",
     headline: "",
+    experiences: [emptySlot(), emptySlot(), emptySlot()],
   });
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -44,6 +62,19 @@ export default function NominatePage() {
     }));
   }
 
+  function updateExperience(index: number, field: keyof ExperienceSlot, value: string) {
+    setForm((f) => {
+      const updated = [...f.experiences] as FormState["experiences"];
+      updated[index] = { ...updated[index], [field]: value };
+      return { ...f, experiences: updated };
+    });
+  }
+
+  function handleDomainBlur(index: number, raw: string) {
+    if (!raw.trim()) return;
+    updateExperience(index, "companyDomain", normalizeDomain(raw));
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!form.name || !form.school || !form.profileUrl) return;
@@ -51,6 +82,16 @@ export default function NominatePage() {
       setError("Please enter a valid Ivy League .edu email or leave it blank.");
       return;
     }
+
+    // Only include slots where both company name and role title are filled
+    const experiences = form.experiences
+      .filter((s) => s.companyName.trim() && s.roleTitle.trim())
+      .map((s, i) => ({
+        companyName: s.companyName.trim(),
+        roleTitle: s.roleTitle.trim(),
+        companyDomain: s.companyDomain.trim() ? normalizeDomain(s.companyDomain) : undefined,
+        sortOrder: i,
+      }));
 
     setSubmitting(true);
     setError("");
@@ -63,10 +104,12 @@ export default function NominatePage() {
           name: form.name,
           school: form.school,
           profileUrl: form.profileUrl,
+          photoUrl: form.photoUrl || undefined,
           nominatorName: form.nominator || undefined,
           eduEmail: form.eduEmail || undefined,
           descriptor: form.descriptor || undefined,
           headline: form.headline || undefined,
+          experiences: experiences.length > 0 ? experiences : undefined,
         }),
       });
 
@@ -151,6 +194,19 @@ export default function NominatePage() {
         </Field>
 
         <Field
+          label="Profile photo URL"
+          hint="LinkedIn → right-click profile photo → Copy image address"
+        >
+          <input
+            type="url"
+            placeholder="https://media.licdn.com/dms/image/..."
+            value={form.photoUrl}
+            onChange={(e) => setForm((f) => ({ ...f, photoUrl: e.target.value }))}
+            className={inputCls}
+          />
+        </Field>
+
+        <Field
           label="Their .edu email"
           hint={
             emailEntered
@@ -194,6 +250,42 @@ export default function NominatePage() {
             className={inputCls}
           />
         </Field>
+
+        {/* Experience slots */}
+        <div className="space-y-3 pt-1">
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground font-mono">
+            Top experiences <span className="normal-case font-normal">(optional — up to 3)</span>
+          </p>
+          {form.experiences.map((slot, i) => (
+            <div key={i} className="rounded-lg border border-border bg-muted/30 p-3 space-y-2">
+              <p className="text-[11px] font-mono text-muted-foreground">#{i + 1}</p>
+              <div className="grid grid-cols-2 gap-2">
+                <input
+                  type="text"
+                  placeholder="Company / Org"
+                  value={slot.companyName}
+                  onChange={(e) => updateExperience(i, "companyName", e.target.value)}
+                  className={inputCls}
+                />
+                <input
+                  type="text"
+                  placeholder="Role title"
+                  value={slot.roleTitle}
+                  onChange={(e) => updateExperience(i, "roleTitle", e.target.value)}
+                  className={inputCls}
+                />
+              </div>
+              <input
+                type="text"
+                placeholder="Website (e.g. stripe.com) — for logo"
+                value={slot.companyDomain}
+                onChange={(e) => updateExperience(i, "companyDomain", e.target.value)}
+                onBlur={(e) => handleDomainBlur(i, e.target.value)}
+                className={inputCls}
+              />
+            </div>
+          ))}
+        </div>
 
         <Field label="Your name (optional)">
           <input

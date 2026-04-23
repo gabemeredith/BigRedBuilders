@@ -33,7 +33,6 @@ interface ProfileCardProps {
   player: Player;
   experiences: Experience[];
   revealed: boolean;
-  side: "left" | "right";
   rank?: number;
   picked?: boolean;
   onClick?: () => void;
@@ -48,7 +47,6 @@ export function ProfileCard({
   player,
   experiences,
   revealed,
-  side,
   rank,
   picked = false,
   onClick,
@@ -79,13 +77,6 @@ export function ProfileCard({
             style={{ background: SCHOOL_COLORS[player.school] }}
           />
           {player.school}
-        </span>
-      </div>
-
-      {/* Side key-cap */}
-      <div className="absolute top-3 right-3">
-        <span className="grid size-6 place-items-center rounded-md border border-border font-mono text-xs text-muted-foreground">
-          {side === "left" ? "A" : "B"}
         </span>
       </div>
 

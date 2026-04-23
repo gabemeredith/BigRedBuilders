@@ -5,7 +5,7 @@ import type { IvySchool } from "@/types";
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
-  const { name, school, profileUrl, nominatorName, eduEmail, descriptor, headline } = body;
+  const { name, school, profileUrl, photoUrl, nominatorName, eduEmail, descriptor, headline, experiences } = body;
 
   if (!name || !school || !profileUrl) {
     return NextResponse.json({ error: "name, school, and profileUrl are required" }, { status: 400 });
@@ -33,6 +33,8 @@ export async function POST(req: NextRequest) {
     edu_email: eduEmail || null,
     email_verified: false,
     profile_url: profileUrl,
+    photo_url: photoUrl || null,
+    experiences: experiences ?? null,
     nominator_name: nominatorName || null,
     descriptor: descriptor || null,
     headline: headline || null,
