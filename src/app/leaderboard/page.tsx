@@ -1,8 +1,28 @@
 import { Leaderboard } from "@/components/Leaderboard";
 import { NominateBanner } from "@/components/NominateBanner";
-import { players } from "@/data/players";
+import type { Player } from "@/types";
 
-export default function LeaderboardPage() {
+async function getPlayers(school?: string): Promise<Player[]> {
+  const url = school
+    ? `/api/leaderboard?school=${encodeURIComponent(school)}`
+    : "/api/leaderboard";
+
+  // Use absolute URL for server-side fetch
+  const base = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  const res = await fetch(`${base}${url}`, { next: { revalidate: 30 } });
+  if (!res.ok) return [];
+  const data = await res.json();
+  return data.players ?? [];
+}
+
+export default async function LeaderboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ school?: string }>;
+}) {
+  const { school } = await searchParams;
+  const players = await getPlayers(school);
+
   return (
     <div className="flex flex-1 flex-col gap-6 py-12">
       <div className="text-center">

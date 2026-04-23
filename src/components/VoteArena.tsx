@@ -7,82 +7,93 @@ import { VoteControls } from "./VoteControls";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 
-interface VoteArenaProps {
-  players: Player[];
-  experiences: Experience[];
-}
+type MatchupPlayer = Player & { experiences: Experience[] };
 
-function pickPair(players: Player[], prevIds?: [string, string]): [Player, Player] {
-  const pool = players.filter((p) => p.isActive);
-  if (pool.length < 2) throw new Error("Need at least 2 active players");
+type Matchup = {
+  matchId: string;
+  left: MatchupPlayer;
+  right: MatchupPlayer;
+};
 
-  let left: Player;
-  let right: Player;
-  do {
-    left = pool[Math.floor(Math.random() * pool.length)];
-    right = pool[Math.floor(Math.random() * pool.length)];
-  } while (
-    left.id === right.id ||
-    (prevIds && left.id === prevIds[0] && right.id === prevIds[1]) ||
-    (prevIds && left.id === prevIds[1] && right.id === prevIds[0])
-  );
-
-  return [left, right];
+function getSessionId(): string {
+  if (typeof window === "undefined") return "";
+  const key = "rivyalry:session";
+  let id = localStorage.getItem(key);
+  if (!id) {
+    id = crypto.randomUUID();
+    localStorage.setItem(key, id);
+  }
+  return id;
 }
 
 function randomAgreement() {
   return Math.floor(Math.random() * 26) + 52; // 52–78
 }
 
-export function VoteArena({ players, experiences }: VoteArenaProps) {
-  const [pair, setPair] = useState<[Player, Player] | null>(null);
+export function VoteArena() {
+  const [matchup, setMatchup] = useState<Matchup | null>(null);
   const [phase, setPhase] = useState<"voting" | "revealed">("voting");
   const [matchKey, setMatchKey] = useState(0);
   const [lastVote, setLastVote] = useState<VoteResult | null>(null);
   const [agreement, setAgreement] = useState(62);
   const [copied, setCopied] = useState(false);
+  const [loadError, setLoadError] = useState(false);
   const nextRef = useRef<() => void>(() => {});
 
-  // Rank lookup by rating
   const rankMap = useMemo(() => {
-    const sorted = [...players].sort((a, b) => b.rating - a.rating);
+    // We only have two players in context, so just compare their ratings
+    if (!matchup) return new Map<string, number>();
+    const sorted = [matchup.left, matchup.right].sort((a, b) => b.rating - a.rating);
     const map = new Map<string, number>();
     sorted.forEach((p, i) => map.set(p.id, i + 1));
     return map;
-  }, [players]);
+  }, [matchup]);
 
-  useEffect(() => {
-    setPair(pickPair(players));
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const loadMatchup = useCallback(async () => {
+    setLoadError(false);
+    try {
+      const res = await fetch("/api/matchup");
+      if (!res.ok) throw new Error("Failed");
+      const data = await res.json();
+      setMatchup(data);
+    } catch {
+      setLoadError(true);
+    }
   }, []);
 
-  const leftExperiences = useMemo(
-    () => pair ? experiences.filter((e) => e.playerId === pair[0].id) : [],
-    [experiences, pair]
-  );
-  const rightExperiences = useMemo(
-    () => pair ? experiences.filter((e) => e.playerId === pair[1].id) : [],
-    [experiences, pair]
-  );
+  useEffect(() => {
+    loadMatchup();
+  }, [loadMatchup]);
 
-  const advance = useCallback(() => {
-    setPair((prev) => prev ? pickPair(players, [prev[0].id, prev[1].id]) : pickPair(players));
+  const advance = useCallback(async () => {
+    setMatchup(null);
     setPhase("voting");
     setLastVote(null);
     setMatchKey((k) => k + 1);
-  }, [players]);
+    await loadMatchup();
+  }, [loadMatchup]);
 
-  // Keep ref in sync so the keydown handler always calls the latest version
   useEffect(() => { nextRef.current = advance; }, [advance]);
 
   const handleVote = useCallback(
-    (result: VoteResult) => {
-      if (phase === "revealed" || !pair) return;
+    async (result: VoteResult) => {
+      if (phase === "revealed" || !matchup) return;
       setLastVote(result);
       setAgreement(randomAgreement());
       setPhase("revealed");
+
+      // Fire-and-forget — submit vote to backend
+      fetch("/api/vote", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          matchId: matchup.matchId,
+          result,
+          sessionId: getSessionId(),
+        }),
+      }).catch(() => {});
     },
-    [phase, pair]
+    [phase, matchup]
   );
 
   // Keyboard shortcuts
@@ -113,10 +124,9 @@ export function VoteArena({ players, experiences }: VoteArenaProps) {
   }, []);
 
   const pickedName =
-    !pair || !lastVote ? null
-    : lastVote === "left" ? pair[0].name
-    : lastVote === "right" ? pair[1].name
-    : lastVote === "equal" ? null
+    !matchup || !lastVote ? null
+    : lastVote === "left" ? matchup.left.name
+    : lastVote === "right" ? matchup.right.name
     : null;
 
   const revealHeadline =
@@ -125,7 +135,21 @@ export function VoteArena({ players, experiences }: VoteArenaProps) {
     : pickedName ? `You picked ${pickedName}.`
     : null;
 
-  if (!pair) {
+  if (loadError) {
+    return (
+      <div className="flex flex-col items-center gap-3 py-10 text-center">
+        <p className="text-sm text-muted-foreground font-mono">Couldn&apos;t load matchup.</p>
+        <button
+          onClick={loadMatchup}
+          className="rounded-md border border-border px-4 py-2 text-sm font-semibold hover:bg-muted"
+        >
+          Try again
+        </button>
+      </div>
+    );
+  }
+
+  if (!matchup) {
     return (
       <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5">
         {[0, 1].map((i) => (
@@ -157,7 +181,6 @@ export function VoteArena({ players, experiences }: VoteArenaProps) {
 
   return (
     <div className="flex w-full flex-col items-center gap-6">
-      {/* Cards */}
       <AnimatePresence mode="wait">
         <motion.div
           key={matchKey}
@@ -168,27 +191,26 @@ export function VoteArena({ players, experiences }: VoteArenaProps) {
           className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5"
         >
           <ProfileCard
-            player={pair[0]}
-            experiences={leftExperiences}
+            player={matchup.left}
+            experiences={matchup.left.experiences}
             revealed={phase === "revealed"}
             side="left"
-            rank={rankMap.get(pair[0].id)}
+            rank={rankMap.get(matchup.left.id)}
             picked={phase === "revealed" && lastVote === "left"}
             onClick={phase === "voting" ? () => handleVote("left") : undefined}
           />
           <ProfileCard
-            player={pair[1]}
-            experiences={rightExperiences}
+            player={matchup.right}
+            experiences={matchup.right.experiences}
             revealed={phase === "revealed"}
             side="right"
-            rank={rankMap.get(pair[1].id)}
+            rank={rankMap.get(matchup.right.id)}
             picked={phase === "revealed" && lastVote === "right"}
             onClick={phase === "voting" ? () => handleVote("right") : undefined}
           />
         </motion.div>
       </AnimatePresence>
 
-      {/* Controls or Reveal banner */}
       <AnimatePresence mode="wait">
         {phase === "voting" ? (
           <motion.div
@@ -210,7 +232,6 @@ export function VoteArena({ players, experiences }: VoteArenaProps) {
             transition={{ duration: 0.25 }}
             className="flex w-full flex-col items-center gap-4"
           >
-            {/* Reveal banner */}
             <div className="flex flex-col items-center gap-1.5 text-center">
               <p className="text-xl font-black tracking-tight">{revealHeadline}</p>
               {lastVote !== "skip" && (
@@ -221,7 +242,6 @@ export function VoteArena({ players, experiences }: VoteArenaProps) {
               )}
             </div>
 
-            {/* Actions */}
             <div className="flex flex-wrap items-center justify-center gap-2">
               <button
                 onClick={advance}
@@ -247,7 +267,6 @@ export function VoteArena({ players, experiences }: VoteArenaProps) {
         )}
       </AnimatePresence>
 
-      {/* Footer footnote */}
       <p className="font-mono text-[11px] text-muted-foreground text-center">
         listing ≠ endorsement &nbsp;·&nbsp;{" "}
         <Link href="/about" className="hover:text-foreground underline underline-offset-2">how ranking works</Link>
