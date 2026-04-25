@@ -83,11 +83,40 @@ export function generateMatchup(
     recentPlayerIds.add(match.playerRightId);
   }
 
+  // Rotation guarantee: any player absent from the last N matches must appear next.
+  // N = pool size * 2 ensures everyone gets a turn before anyone repeats too often.
+  // recentMatches are sorted most-recent-first, so take from the front.
+  const rotationWindow = eligible.length * 2;
+  const recentWindow = recentMatches.slice(0, rotationWindow);
+  const recentWindowIds = new Set<string>();
+  for (const match of recentWindow) {
+    recentWindowIds.add(match.playerLeftId);
+    recentWindowIds.add(match.playerRightId);
+  }
+  const starvedPlayers = eligible.filter((p) => !recentWindowIds.has(p.id));
+
+  // If any players have been starved of appearances, force one into the next matchup.
+  // Pick the most-starved (lowest exposure_count) and find their best opponent.
+  let forcedPlayer: Player | null = null;
+  if (starvedPlayers.length > 0) {
+    forcedPlayer = starvedPlayers.reduce((a, b) =>
+      a.exposureCount <= b.exposureCount ? a : b
+    );
+  }
+
   // Score all possible pairs and pick the best
   let bestCandidate: MatchupCandidate | null = null;
 
   for (let i = 0; i < eligible.length; i++) {
     for (let j = i + 1; j < eligible.length; j++) {
+      // Skip pairs that don't include the forced player (if one exists)
+      if (
+        forcedPlayer &&
+        eligible[i].id !== forcedPlayer.id &&
+        eligible[j].id !== forcedPlayer.id
+      ) {
+        continue;
+      }
       const score = scoreMatchup(eligible[i], eligible[j], recentPlayerIds);
       if (!bestCandidate || score > bestCandidate.score) {
         bestCandidate = {
